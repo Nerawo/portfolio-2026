@@ -1,0 +1,48 @@
+.project-detail { background: var(--paper); }
+.project-main { padding-top: 3.75rem; }
+.case-header { padding: clamp(3.75rem, 6vw, 6rem) var(--pad) clamp(2.5rem, 4vw, 4rem); }
+.case-header h1 { max-width: 1200px; font-size: clamp(4rem, 10vw, 10rem); text-wrap: balance; }
+.case-lede { display: grid; grid-template-columns: 2fr 1fr; gap: clamp(2rem, 5vw, 6rem); margin-top: clamp(2rem, 3.5vw, 3.5rem); }
+.case-lede > p { max-width: 50rem; margin: 0; font-size: clamp(1.15rem, 1.8vw, 1.7rem); line-height: 1.5; letter-spacing: .01em; }
+.case-facts { border-top: 1px solid var(--line); }
+.case-facts p { display: flex; justify-content: space-between; gap: 1rem; margin: 0; padding: .8rem 0; border-bottom: 1px solid var(--line); font: 500 .65rem/1.4 "Courier New", monospace; letter-spacing: .04em; text-transform: uppercase; }
+.case-facts span:first-child { color: var(--muted); }
+.case-hero-media { margin: 0 var(--pad); aspect-ratio: 16 / 9; overflow: hidden; border-radius: .55rem; background: var(--media-bg); }
+.case-hero-media img, .case-hero-media video { width: 100%; height: 100%; object-fit: cover; }
+.case-body { max-width: 1240px; margin: 0 auto; padding: clamp(3.5rem, 6vw, 6rem) var(--pad); }
+.case-section { display: grid; grid-template-columns: .75fr 2fr; gap: clamp(2rem, 5vw, 6rem); padding: clamp(2.25rem, 3.75vw, 3.75rem) 0; border-top: 1px solid var(--line); }
+.case-section-label { color: var(--muted); font: 500 .65rem/1.4 "Courier New", monospace; letter-spacing: .06em; text-transform: uppercase; }
+.case-section h2 { max-width: 16em; margin: 0 0 1.25rem; font-size: clamp(1.8rem, 2.8vw, 3.25rem); line-height: 1.12; letter-spacing: -.005em; }
+.case-section-copy p { max-width: 48rem; margin: 0 0 1.25rem; font-size: clamp(1rem, 1.3vw, 1.2rem); line-height: 1.68; letter-spacing: .012em; }
+.case-section-copy ul { max-width: 48rem; margin: 1.5rem 0 0; padding-left: 1.25rem; }
+.case-section-copy li { margin-bottom: .7rem; line-height: 1.55; }
+.case-inline-media { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: clamp(1.5rem, 2.5vw, 2.5rem); }
+.case-inline-media.two-up { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.case-inline-media figure { min-width: 0; margin: 0; }
+.case-inline-media:not(.two-up) figure { width: fit-content; max-width: 100%; }
+.case-inline-media img { display: block; width: auto; max-width: 100%; height: auto; max-height: 720px; border-radius: .45rem; object-fit: contain; object-position: left top; }
+.case-inline-media.two-up img { width: 100%; }
+.case-inline-media figcaption { padding-top: .6rem; color: var(--muted); font: 500 .62rem/1.4 "Courier New", monospace; letter-spacing: .04em; text-transform: uppercase; }
+
+[data-lang="zh"] .case-section h2 { max-width: 14em; font-size: clamp(1.75rem, 2.65vw, 3rem); line-height: 1.15; word-break: keep-all; overflow-wrap: normal; text-wrap: balance; }
+[data-lang="zh"] .case-inline-media figcaption { font-family: "GuanKiap TsingKhai", "Kaiti SC", STKaiti, sans-serif; font-weight: 400; letter-spacing: .06em; }
+.case-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--pad); padding: 0 var(--pad) clamp(6rem, 10vw, 10rem); }
+.case-gallery figure { margin: 0; }
+.case-gallery figure:first-child:nth-last-child(odd) { grid-column: 1 / -1; }
+.case-gallery-media { aspect-ratio: 16 / 10; overflow: hidden; border-radius: .45rem; background: var(--media-bg); }
+.case-gallery img, .case-gallery video { width: 100%; height: 100%; object-fit: cover; }
+.case-gallery figcaption { padding-top: .65rem; color: var(--muted); font: 500 .62rem/1.4 "Courier New", monospace; letter-spacing: .04em; text-transform: uppercase; }
+.case-next { display: none; }
+.case-next span { font: 500 .65rem "Courier New", monospace; letter-spacing: .06em; text-transform: uppercase; }
+.case-next strong { display: block; margin-top: 1rem; font-size: clamp(2.5rem, 6vw, 6rem); font-weight: 400; letter-spacing: -.055em; line-height: 1; }
+.case-next .arrow { font-size: clamp(2rem, 4vw, 4rem); }
+
+@media (max-width: 720px) {
+  .case-lede, .case-section { grid-template-columns: 1fr; }
+  .case-header h1 { font-size: clamp(3.5rem, 17vw, 6rem); }
+  .case-hero-media { aspect-ratio: 4 / 3; }
+  .case-gallery { grid-template-columns: 1fr; }
+  .case-inline-media.two-up { grid-template-columns: 1fr; }
+  .case-gallery figure:first-child:nth-last-child(odd) { grid-column: auto; }
+  .case-next { grid-template-columns: 1fr; }
+}

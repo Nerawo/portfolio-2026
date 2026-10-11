@@ -1,0 +1,10 @@
+# Local tools and generated working files
+tmp/
+
+# Full-quality source media kept locally
+*.source.mp4
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+desktop.ini
