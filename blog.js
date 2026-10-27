@@ -10,7 +10,13 @@
   document.querySelectorAll('.blog-video > video').forEach(video => {
     const caption = video.parentElement.querySelector('figcaption');
     if (!caption) return;
-    const align = () => { caption.style.maxWidth = video.getBoundingClientRect().width + 'px'; };
+    const prose = video.closest('.blog-prose');
+    const align = () => {
+      const width = video.getBoundingClientRect().width;
+      caption.style.maxWidth = width + 'px';
+      // Standard images follow the first player without changing its dimensions.
+      if (width > 0 && video === prose?.querySelector('.blog-video > video')) prose.style.setProperty('--blog-image-width', width + 'px');
+    };
     align();
     new ResizeObserver(align).observe(video);
   });
