@@ -243,13 +243,35 @@ function listingExcerpt(post) {
     .replace(/\s+/g, ' ').trim().slice(0, 240);
 }
 
+// Presentation only, after media detection: leave custom link labels and media intact.
+function articleSourceLinks(html) {
+  return html.replace(/<p>\s*(?:(?:From|Source|来源|來源)\s*[:：]?\s*)?(<a\b[^>]*>[^<]*<\/a>)\s*<\/p>/gi, (paragraph, link) => {
+    let attrs, label = '';
+    sanitize(link, { allowedTags: ['a'], allowedAttributes: { a: ['href'] }, transformTags: { a: (tagName, attribs) => { attrs = attribs; return { tagName, attribs }; } }, textFilter: text => { label += text; return text; } });
+    try {
+      const url = new URL(attrs?.href);
+      const displayed = label.replaceAll('&amp;', '&').trim();
+      const displayedUrl = new URL(displayed.startsWith('www.') ? 'http://' + displayed : displayed);
+      if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password || displayedUrl.href !== url.href) return paragraph;
+      const host = url.hostname.replace(/^www\./, '');
+      const name = host === 'gettyimages.com' ? 'Getty Images' : host.length <= 48 ? host : '';
+      const caption = name ? 'Source: ' + name + ' ↗' : 'View source ↗';
+      const opening = link.slice(0, link.indexOf('>')).replace(/^<a\b/i, '<a class="blog-source-link" data-blog-source="' + escape(name) + '"');
+      return '<p class="blog-source">' + opening + '>' + escape(caption) + '</a></p>';
+    } catch { return paragraph; }
+  });
+}
+
+// Dates are displayed in UTC throughout the existing Blog interface.
+const calendarDate = iso => new Date(iso).toISOString().slice(0, 10);
+
 export function renderBlog(prepared, config, indexHtml) {
   const pages = new Map();
   const cards = prepared.posts.map(post => { const excerpt = listingExcerpt(post); return `<article class="blog-entry${post.cover ? ' has-cover' : ''}"><div class="blog-entry-copy"><p class="blog-date">${time(post.createdAt)}</p><h2><a href="blog/${post.path}">${escape(post.title)}</a></h2>${excerpt ? `<p class="blog-entry-excerpt">${escape(excerpt)}</p>` : ''}<a class="text-link" href="blog/${post.path}" data-blog-ui="read">Read article ↗</a></div>${post.cover ? `<a class="blog-cover" href="blog/${post.path}" tabindex="-1" aria-hidden="true"><img src="blog/media/${post.cover.filename}" alt="" width="${post.cover.width}" height="${post.cover.height}" loading="lazy"></a>` : ''}</article>`; }).join('\n');
   const empty = `<section class="blog-empty"><h2 data-blog-ui="emptyTitle">No posts yet.</h2><p data-blog-ui="emptyText">Articles will appear here when they are published. In the meantime, explore my work.</p><a class="text-link" href="work.html" data-blog-ui="explore">Explore Work ↗</a></section>`;
   pages.set('blog.html', shell({ title: 'Blog', description: 'Notes on technical art, tools and creative practice by Lu Zhang.', indexHtml, prefix: '', canonical: new URL('blog.html', config.siteUrl).href, content: `<header class="blog-heading"><p class="eyebrow" data-blog-ui="notes">Notes &amp; experiments</p><h1 data-blog-ui="title">Blog.</h1></header><div class="blog-list">${cards || empty}</div>` }));
   for (const post of prepared.posts) {
-    const content = `<article class="blog-article"><header class="blog-article-header"><a class="blog-back" href="../blog.html" data-blog-ui="back">← All articles</a><p class="blog-date"><span data-blog-ui="published">Published</span> ${time(post.createdAt)}${post.updatedAt !== post.createdAt ? ` <span class="blog-updated"><span data-blog-ui="updated">Updated</span> ${time(post.updatedAt)}</span>` : ''}</p><h1>${escape(post.title)}</h1></header><div class="blog-prose">${post.html}</div><div class="blog-article-bottom"><a href="../blog.html" data-blog-ui="back">← All articles</a><a href="${escape(post.url)}" rel="noopener noreferrer" data-blog-ui="original">Read on GitHub ↗</a></div></article>`;
+    const content = `<article class="blog-article"><header class="blog-article-header"><a class="blog-back" href="../blog.html" data-blog-ui="back">← All articles</a><p class="blog-date"><span data-blog-ui="published">Published</span> ${time(post.createdAt)}${calendarDate(post.updatedAt) !== calendarDate(post.createdAt) ? ` <span class="blog-updated"><span data-blog-ui="updated">Updated</span> ${time(post.updatedAt)}</span>` : ''}</p><h1>${escape(post.title)}</h1></header><div class="blog-prose">${articleSourceLinks(post.html)}</div><div class="blog-article-bottom"><a href="../blog.html" data-blog-ui="back">← All articles</a><a href="${escape(post.url)}" rel="noopener noreferrer" data-blog-ui="original">Read on GitHub ↗</a></div></article>`;
     pages.set(`blog/${post.path}`, shell({ title: post.title, description: post.summary, content, indexHtml, prefix: '../', canonical: new URL(`blog/${post.path}`, config.siteUrl).href }));
   }
   return pages;

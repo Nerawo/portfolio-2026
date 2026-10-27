@@ -2,6 +2,18 @@
   const zh = document.documentElement.dataset.lang === 'zh';
   const labels = { notes: '笔记与实验', title: '博客。', emptyTitle: '暂时还没有文章。', emptyText: '文章发布后会显示在这里。你也可以先浏览我的作品。', explore: '查看作品 ↗', read: '阅读全文 ↗', back: '← 返回博客列表', published: '发布于', updated: '更新于', original: '在 GitHub 查看原文 ↗', videoSource: '打开视频原链接 ↗' };
   if (zh) document.querySelectorAll('[data-blog-ui]').forEach(node => { node.textContent = labels[node.dataset.blogUi] || node.textContent; });
+  document.querySelectorAll('.blog-prose [data-blog-source]').forEach(node => {
+    const name = node.dataset.blogSource;
+    node.textContent = zh ? name ? '来源：' + name + ' ↗' : '查看来源 ↗' : name ? 'Source: ' + name + ' ↗' : 'View source ↗';
+  });
+  // Align the fallback with the rendered player, including narrower portrait media.
+  document.querySelectorAll('.blog-video > video').forEach(video => {
+    const caption = video.parentElement.querySelector('figcaption');
+    if (!caption) return;
+    const align = () => { caption.style.maxWidth = video.getBoundingClientRect().width + 'px'; };
+    align();
+    new ResizeObserver(align).observe(video);
+  });
   document.querySelectorAll('[data-blog-date]').forEach(node => { node.textContent = new Intl.DateTimeFormat(zh ? 'zh-CN' : 'en', { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(node.dateTime)); });
   const toggle = document.querySelector('.theme-toggle');
   const icons = '<svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg><svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.2A8.6 8.6 0 0 1 8.8 3.8 8.6 8.6 0 1 0 20.2 15.2Z"></path></svg>';
