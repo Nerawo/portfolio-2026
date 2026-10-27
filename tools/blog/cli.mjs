@@ -24,12 +24,12 @@ try {
   if (process.env.GITHUB_REPOSITORY && process.env.GITHUB_REPOSITORY.toLowerCase() !== config.repository.toLowerCase()) throw new Error('This workflow is restricted to the configured repository.');
   phase = 'fetching the complete Discussions snapshot';
   const snapshot = await fetchSnapshot(config, process.env.GITHUB_TOKEN);
-  phase = 'validating authors, Markdown and anonymous image access';
+  phase = 'validating authors, Markdown and anonymous media access';
   const prepared = await preparePosts(snapshot, config);
   phase = 'staging the entire existing portfolio and generated blog';
   const report = await buildSite(root, output, prepared, config);
-  await summary(`## Blog sync completed\n\nPublished articles: **${report.posts}**\n\nVerified public images: **${report.images}**\n\nCategory ID: \`${snapshot.category.id}\`\n\nThe deploy job must also succeed before these changes are live.`);
-  console.log(`Blog snapshot built: ${report.posts} posts, ${report.images} verified public images. Ready for the dependent Pages deploy job.`);
+  await summary(`## Blog sync completed\n\nPublished articles: **${report.posts}**\n\nVerified public media files: **${report.images}**\n\nCategory ID: \`${snapshot.category.id}\`\n\nThe deploy job must also succeed before these changes are live.`);
+  console.log(`Blog snapshot built: ${report.posts} posts, ${report.images} verified public media files. Ready for the dependent Pages deploy job.`);
 } catch (error) {
   if (stage) await fs.rm(stage, { recursive: true, force: true });
   await summary(`## Blog sync failed\n\nPhase: ${phase}\n\n${error.message}\n\nNo new Pages artifact will be deployed. The previous deployment remains online. See BLOG_GUIDE.md and re-run the workflow after fixing the issue.`);

@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import { Marked } from 'marked';
 import sanitize from 'sanitize-html';
 import { imageSize } from 'image-size';
+import { renderMediaLinks } from './media.mjs';
 
 export const escape = value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const plain = value => sanitize(value, { allowedTags: [], allowedAttributes: {} }).replace(/\s+/g, ' ').trim();
@@ -56,7 +57,10 @@ function markdownParser() {
 }
 
 export function cleanMarkdown(markdown, discussionUrl) {
-  const html = markdownParser().parse(markdown);
+  return cleanArticleHtml(markdownParser().parse(markdown), discussionUrl);
+}
+
+export function cleanArticleHtml(html, discussionUrl) {
   return sanitize(html, {
     allowedTags: ['h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'strong', 'em', 'del', 'a', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td'],
     allowedAttributes: { a: ['href', 'title', 'rel'], img: ['src', 'alt', 'width', 'height'], code: ['class'], h2: ['id'], h3: ['id'], h4: ['id'], h5: ['id'], h6: ['id'], ol: ['start'] },
@@ -121,7 +125,7 @@ export async function fetchSnapshot(config, token, { fetcher = fetch, categoryId
   return { repository: config.repository, complete: true, category, discussions };
 }
 
-function permittedImage(url) {
+export function permittedImage(url) {
   if (url.protocol !== 'https:' || url.username || url.password || url.port) return false;
   const host = url.hostname.toLowerCase();
   if (host === 'github.com') return /^\/user-attachments\/assets\/[a-f0-9-]+\/?$/i.test(url.pathname);
@@ -155,7 +159,7 @@ export async function downloadImage(source, { fetcher = fetch } = {}) {
 }
 
 export async function preparePosts(snapshot, config, { fetcher = fetch } = {}) {
-  const selected = selectPosts(snapshot, config), assets = new Map(), cache = new Map();
+  const selected = selectPosts(snapshot, config), assets = new Map(), cache = new Map(), videoCache = new Map();
   async function image(source) {
     if (!cache.has(source)) cache.set(source, downloadImage(source, { fetcher }).then(result => { assets.set(result.filename, result.buffer); return result; }));
     return cache.get(source);
@@ -175,6 +179,7 @@ export async function preparePosts(snapshot, config, { fetcher = fetch } = {}) {
     }
     // Block figures must not live inside a Markdown paragraph; split mixed text/image paragraphs safely.
     html = html.replace(/<p>([\s\S]*?)<\/p>/g, (whole, inside) => inside.includes('<figure') ? inside.split(/(<figure[\s\S]*?<\/figure>)/g).map(part => part.startsWith('<figure') ? part : part.trim() ? `<p>${part}</p>` : '').join('') : whole);
+    html = await renderMediaLinks(html, { fetcher, permittedUrl: permittedImage, assets, cache: videoCache });
     const summary = editorial.summary || plain(cleanMarkdown(editorial.markdown, post.url).replace(/<pre>[\s\S]*?<\/pre>/g, '')).slice(0, 180);
     const cover = editorial.cover ? await image(editorial.cover) : null;
     posts.push({ ...post, html, summary, cover });
@@ -205,11 +210,44 @@ function shell({ title, description, content, indexHtml, prefix, canonical }) {
 const date = iso => new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(iso));
 const time = iso => `<time datetime="${escape(iso)}" data-blog-date>${date(iso)}</time>`;
 
+// Listing excerpts are derived separately: article HTML and metadata stay intact.
+function listingExcerpt(post) {
+  const editorial = typeof post.body === 'string' ? parseEditorial(post.body) : null;
+  const source = editorial ? editorial.summary || editorial.markdown : post.summary || '';
+  const mediaLink = href => {
+    try {
+      const url = new URL(href);
+      return (url.hostname === 'github.com' && url.pathname.startsWith('/user-attachments/')) ||
+        /^(?:www\.|m\.)?(?:youtube\.com|youtube-nocookie\.com|youtu\.be|vimeo\.com|player\.vimeo\.com)$/.test(url.hostname) ||
+        /\.(?:mp4|webm|mov|m4v|png|jpe?g|gif|webp|avif|svg)$/i.test(url.pathname);
+    } catch { return false; }
+  };
+  const inline = tokens => (tokens || []).map(token => {
+    if (['image', 'html', 'codespan'].includes(token.type)) return ' ';
+    if (token.type === 'link' && (mediaLink(token.href) || /^(?:https?:\/\/|www\.|mailto:)/i.test(token.text.trim()))) return ' ';
+    if (token.type === 'br') return ' ';
+    return token.tokens ? inline(token.tokens) : token.text || '';
+  }).join('');
+  const blocks = tokens => tokens.map(token => {
+    if (token.type === 'paragraph' || token.type === 'text') {
+      const value = token.tokens ? inline(token.tokens) : token.text || '';
+      return /^(?:from|source|video|image|reference|来源|视频|图片|参考)\s*[:：]?$/i.test(value.trim()) && /https?:\/\//i.test(token.raw) ? '' : value;
+    }
+    if (token.type === 'list') return token.items.map(item => blocks(item.tokens)).join(' ');
+    if (token.type === 'blockquote') return blocks(token.tokens);
+    return '';
+  }).join(' ');
+  return blocks(new Marked({ gfm: true }).lexer(source))
+    .replace(/(?:https?:\/\/|www\.)[^\s<>]+/gi, ' ')
+    .replace(/\s+([,.;:!?，。；：！？])/g, '$1')
+    .replace(/\s+/g, ' ').trim().slice(0, 240);
+}
+
 export function renderBlog(prepared, config, indexHtml) {
   const pages = new Map();
-  const cards = prepared.posts.map(post => `<article class="blog-entry${post.cover ? ' has-cover' : ''}"><div><p class="blog-date">${time(post.createdAt)}</p><h2><a href="blog/${post.path}">${escape(post.title)}</a></h2><p>${escape(post.summary)}</p><a class="text-link" href="blog/${post.path}" data-blog-ui="read">Read article ↗</a></div>${post.cover ? `<a class="blog-cover" href="blog/${post.path}" tabindex="-1" aria-hidden="true"><img src="blog/media/${post.cover.filename}" alt="" width="${post.cover.width}" height="${post.cover.height}" loading="lazy"></a>` : ''}</article>`).join('\n');
+  const cards = prepared.posts.map(post => { const excerpt = listingExcerpt(post); return `<article class="blog-entry${post.cover ? ' has-cover' : ''}"><div class="blog-entry-copy"><p class="blog-date">${time(post.createdAt)}</p><h2><a href="blog/${post.path}">${escape(post.title)}</a></h2>${excerpt ? `<p class="blog-entry-excerpt">${escape(excerpt)}</p>` : ''}<a class="text-link" href="blog/${post.path}" data-blog-ui="read">Read article ↗</a></div>${post.cover ? `<a class="blog-cover" href="blog/${post.path}" tabindex="-1" aria-hidden="true"><img src="blog/media/${post.cover.filename}" alt="" width="${post.cover.width}" height="${post.cover.height}" loading="lazy"></a>` : ''}</article>`; }).join('\n');
   const empty = `<section class="blog-empty"><h2 data-blog-ui="emptyTitle">No posts yet.</h2><p data-blog-ui="emptyText">Articles will appear here when they are published. In the meantime, explore my work.</p><a class="text-link" href="work.html" data-blog-ui="explore">Explore Work ↗</a></section>`;
-  pages.set('blog.html', shell({ title: 'Blog', description: 'Notes on technical art, tools and creative practice by Lu Zhang.', indexHtml, prefix: '', canonical: new URL('blog.html', config.siteUrl).href, content: `<header class="blog-heading"><p class="eyebrow" data-blog-ui="notes">Notes & experiments</p><h1 data-blog-ui="title">Blog</h1></header><div class="blog-list">${cards || empty}</div>` }));
+  pages.set('blog.html', shell({ title: 'Blog', description: 'Notes on technical art, tools and creative practice by Lu Zhang.', indexHtml, prefix: '', canonical: new URL('blog.html', config.siteUrl).href, content: `<header class="blog-heading"><p class="eyebrow" data-blog-ui="notes">Notes &amp; experiments</p><h1 data-blog-ui="title">Blog.</h1></header><div class="blog-list">${cards || empty}</div>` }));
   for (const post of prepared.posts) {
     const content = `<article class="blog-article"><header class="blog-article-header"><a class="blog-back" href="../blog.html" data-blog-ui="back">← All articles</a><p class="blog-date"><span data-blog-ui="published">Published</span> ${time(post.createdAt)}${post.updatedAt !== post.createdAt ? ` <span class="blog-updated"><span data-blog-ui="updated">Updated</span> ${time(post.updatedAt)}</span>` : ''}</p><h1>${escape(post.title)}</h1></header><div class="blog-prose">${post.html}</div><div class="blog-article-bottom"><a href="../blog.html" data-blog-ui="back">← All articles</a><a href="${escape(post.url)}" rel="noopener noreferrer" data-blog-ui="original">Read on GitHub ↗</a></div></article>`;
     pages.set(`blog/${post.path}`, shell({ title: post.title, description: post.summary, content, indexHtml, prefix: '../', canonical: new URL(`blog/${post.path}`, config.siteUrl).href }));

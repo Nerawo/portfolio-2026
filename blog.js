@@ -1,6 +1,6 @@
 (() => {
   const zh = document.documentElement.dataset.lang === 'zh';
-  const labels = { notes: '笔记与实验', title: '博客', emptyTitle: '暂时还没有文章。', emptyText: '文章发布后会显示在这里。你也可以先浏览我的作品。', explore: '查看作品 ↗', read: '阅读全文 ↗', back: '← 返回博客列表', published: '发布于', updated: '更新于', original: '在 GitHub 查看原文 ↗' };
+  const labels = { notes: '笔记与实验', title: '博客。', emptyTitle: '暂时还没有文章。', emptyText: '文章发布后会显示在这里。你也可以先浏览我的作品。', explore: '查看作品 ↗', read: '阅读全文 ↗', back: '← 返回博客列表', published: '发布于', updated: '更新于', original: '在 GitHub 查看原文 ↗', videoSource: '打开视频原链接 ↗' };
   if (zh) document.querySelectorAll('[data-blog-ui]').forEach(node => { node.textContent = labels[node.dataset.blogUi] || node.textContent; });
   document.querySelectorAll('[data-blog-date]').forEach(node => { node.textContent = new Intl.DateTimeFormat(zh ? 'zh-CN' : 'en', { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(node.dateTime)); });
   const toggle = document.querySelector('.theme-toggle');
