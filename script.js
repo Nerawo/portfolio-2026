@@ -31,7 +31,7 @@ motionPreference.addEventListener('change',()=>{requestHeroFrame();if(!motionPre
 window.addEventListener('scroll',requestHeroFrame,{passive:true});window.addEventListener('resize',requestHeroFrame);
 
 const mediaMarkup = (project, autoplay = false) => project.video
-  ? `<video ${autoplay ? "autoplay muted loop playsinline" : "muted loop playsinline"} poster="${project.image}"><source src="${project.video}" type="video/mp4"></video>`
+  ? `<video preload="none" ${autoplay ? "autoplay muted loop playsinline" : "muted loop playsinline"} poster="${project.image}"><source src="${project.video}" type="video/mp4"></video>`
   : `<img src="${project.image}" alt="${project.title}" loading="lazy">`;
 
 list.innerHTML = "";
@@ -47,7 +47,19 @@ projects.forEach((project, index) => {
       <time datetime="2026">${project.date}</time>
       <span class="project-arrow">↗</span>
     </div>
-    <div class="project-preview" aria-hidden="true"><img src="${project.image}" alt="" loading="lazy"></div>`;
+    <div class="project-preview" aria-hidden="true">${mediaMarkup(project)}</div>`;
+  const preview = article.querySelector('.project-preview video');
+  const hover = matchMedia('(min-width: 721px) and (hover: hover) and (pointer: fine)');
+  const stopPreview = () => { if (preview) { preview.pause(); preview.currentTime = 0; } };
+  article.addEventListener('mouseenter', () => {
+    if (preview && hover.matches && !motionPreference.matches) {
+      preview.muted = true;
+      preview.play().catch(() => {});
+    }
+  });
+  article.addEventListener('mouseleave', stopPreview);
+  hover.addEventListener('change', stopPreview);
+  motionPreference.addEventListener('change', stopPreview);
   list.appendChild(article);
 });
 

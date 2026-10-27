@@ -175,7 +175,7 @@ nav:not(.case-project-nav) { gap: .5rem; font-size: .82rem; padding: .25rem .6re
 .reel-player video { object-fit:contain; }.reel-meta {font-size:.78rem;}
 .project {display:block;}.project-row {grid-template-columns:130px .2fr 1.4fr 1.5fr .6fr .15fr;gap:1rem;}
 .project-thumbnail {width:130px;height:100px;object-fit:contain;background:var(--media-bg);border-radius:.3rem;}
-.project-preview {display:none;}.project:focus-visible .project-arrow {transform:translate(3px,-3px);}
+.project:focus-visible .project-arrow {transform:translate(3px,-3px);}
 .project-index,.project time {font-size:.78rem;}.project-summary {font-size:1rem;}
 .contact-item span,.footer-bottom {font-size:.78rem;}
 .case-project-nav {position:static;display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;padding:2rem var(--pad);color:var(--ink);background:var(--paper);border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;backdrop-filter:none;text-transform:none;}
@@ -194,3 +194,6 @@ nav:not(.case-project-nav) { gap: .5rem; font-size: .82rem; padding: .25rem .6re
 
 /* Keep the new adjacent Blog navigation label distinct on small screens. */
 .site-header nav > a[href$="blog.html"] { margin-left: .25rem; }
+
+/* Keep the recovered desktop hover preview off touch-only devices. */
+@media (hover: none), (pointer: coarse) { #project-list .project-preview { display: none; } }
