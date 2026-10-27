@@ -21,7 +21,13 @@
  dialog.addEventListener('close',()=>{document.body.classList.remove('viewer-open');trigger?.focus({preventScroll:true});full.removeAttribute('src');});
  document.querySelectorAll('.case-inline-media img').forEach(img=>{
   const button=document.createElement('button');button.className='image-zoom';button.type='button';button.setAttribute('aria-label',(zh?'放大查看：':'Enlarge: ')+img.alt);
-  img.before(button);button.append(img);const label=document.createElement('span');label.textContent=zh?'放大查看 ↗':'Enlarge ↗';button.append(label);
-  button.addEventListener('click',()=>{trigger=button;full.src=img.currentSrc||img.src;full.alt=img.alt;document.body.classList.add('viewer-open');dialog.showModal();dialog.querySelector('button').focus();});
+  img.before(button);button.append(img);const label=document.createElement('span');label.textContent=zh?'放大查看 ↗':'Enlarge ↗';const figure=img.closest('.blog-prose .blog-figure');
+  let zoom;
+  if(figure){
+   let caption=figure.querySelector(':scope > figcaption');if(!caption){caption=document.createElement('figcaption');figure.append(caption);}
+   caption.classList.add('blog-image-caption');zoom=document.createElement('button');zoom.type='button';zoom.className='blog-image-enlarge';zoom.textContent=label.textContent;zoom.setAttribute('aria-label',button.getAttribute('aria-label'));caption.append(zoom);
+  }else button.append(label);
+  const open=source=>{trigger=source;full.src=img.currentSrc||img.src;full.alt=img.alt;document.body.classList.add('viewer-open');dialog.showModal();dialog.querySelector('button').focus();};
+  button.addEventListener('click',()=>open(button));zoom?.addEventListener('click',()=>open(zoom));
  });
 })();

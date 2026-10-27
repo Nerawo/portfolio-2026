@@ -67,3 +67,9 @@
 .blog-prose > :last-child { margin-bottom: 0; }
 .blog-prose a:hover { color: var(--ink); }
 .blog-prose a:focus-visible { color: var(--ink); outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* Keep the Blog image caption and zoom control in one compact footer row. */
+.blog-figure .blog-image-caption { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.blog-image-enlarge { flex: 0 0 auto; margin-left: auto; min-height: 28px; padding: 2px 0; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: .8rem; line-height: 1.6; text-decoration: underline; text-underline-offset: .2em; cursor: zoom-in; }
+.blog-image-enlarge:hover, .blog-image-enlarge:focus-visible { color: var(--ink); }
+.blog-image-enlarge:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }

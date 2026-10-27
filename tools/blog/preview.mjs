@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import sanitize from 'sanitize-html';
 import { imageSize } from 'image-size';
-import { fetchSnapshot, preparePosts, writeBlog, cleanArticleHtml, downloadImage, permittedImage, escape, safeLink } from './lib.mjs';
+import { fetchSnapshot, preparePosts, writeBlog, cleanArticleHtml, downloadImage, permittedImage, imageCaption, escape, safeLink } from './lib.mjs';
 import { renderMediaLinks } from './media.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
@@ -69,8 +69,8 @@ export async function publishedPreview({fetcher=fetch}={}) {
       let attrs;
       sanitize(tag,{allowedTags:['img'],allowedAttributes:{img:['src','alt']},transformTags:{img:(tagName,attribs)=>{attrs=attribs;return{tagName,attribs};}}});
       if(!attrs?.src){html=html.replace(tag,'');continue;}
-      const saved=await image(attrs.src),caption=attrs.alt||'';
-      html=html.replace(tag,`<figure class="blog-figure"><div class="case-inline-media"><img src="media/${saved.filename}" alt="${escape(caption)}" width="${saved.width}" height="${saved.height}" loading="lazy" decoding="async"></div>${caption?`<figcaption>${escape(caption)}</figcaption>`:''}</figure>`);
+      const saved=await image(attrs.src),caption=imageCaption(attrs.alt);
+      html=html.replace(tag,`<figure class="blog-figure"><div class="case-inline-media"><img src="media/${saved.filename}" alt="${escape(attrs.alt || '')}" width="${saved.width}" height="${saved.height}" loading="lazy" decoding="async"></div>${caption?`<figcaption>${escape(caption)}</figcaption>`:''}</figure>`);
     }
     html=html.replace(/<p>\s*(<figure[\s\S]*?<\/figure>)\s*<\/p>/g,'$1');
     // The normal attachment validator (including every redirect) remains in use.

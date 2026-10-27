@@ -100,15 +100,39 @@ async function downloadVideo(source, { fetcher, permittedUrl }) {
   throw new Error('Too many attachment redirects.');
 }
 
+function standaloneMediaLink(link) {
+  let source, label = '';
+  sanitize(link, { allowedTags: ['a'], allowedAttributes: { a: ['href'] }, transformTags: { a: (tagName, attribs) => { source = attribs.href; return { tagName, attribs }; } }, textFilter: text => { label += text; return text; } });
+  const url = secureUrl(source);
+  if (!url || !label || secureUrl(label.replaceAll('&amp;', '&'))?.href !== url.href) return null;
+  const provider = providerVideo(source);
+  return provider || githubAsset(url) ? { source, url, provider } : null;
+}
+
+// A Markdown soft break keeps a URL in the preceding paragraph. Split only
+// complete media-link lines, outside inline formatting; never split prose links.
+function separateMediaLines(html) {
+  return html.replace(/<p>([\s\S]*?)<\/p>/g, (paragraph, inside) => {
+    const output = [], pending = []; let depth = 0, changed = false;
+    const flush = () => { if (pending.join('\n').trim()) output.push('<p>' + pending.join('\n') + '</p>'); pending.length = 0; };
+    for (const line of inside.split(/\r?\n/)) {
+      if (depth === 0 && /^<a\b[^>]*>[^<]*<\/a>$/.test(line.trim()) && standaloneMediaLink(line.trim())) {
+        flush(); output.push('<p>' + line.trim() + '</p>'); changed = true;
+      } else {
+        pending.push(line);
+        for (const [tag] of line.matchAll(/<\/?(?:a|strong|em|del|code)\b[^>]*>/g)) depth += tag.startsWith('</') ? -1 : 1;
+      }
+    }
+    flush(); return changed ? output.join('\n') : paragraph;
+  });
+}
+
 export async function renderMediaLinks(html, { fetcher, permittedUrl, assets, cache, warn = console.warn }) {
+  html = separateMediaLines(html);
   for (const [paragraph, link] of [...html.matchAll(/<p>\s*(<a\b[^>]*>[^<]*<\/a>)\s*<\/p>/g)]) {
-    let source, label = '';
-    sanitize(link, { allowedTags: ['a'], allowedAttributes: { a: ['href'] }, transformTags: { a: (tagName, attribs) => { source = attribs.href; return { tagName, attribs }; } }, textFilter: text => { label += text; return text; } });
-    // Only bare/autolink URLs: named Markdown links remain ordinary links.
-    if (!source || !label || secureUrl(label.replaceAll('&amp;', '&'))?.href !== secureUrl(source)?.href) continue;
-    const url = secureUrl(source);
-    if (!url) continue;
-    const provider = providerVideo(source);
+    const candidate = standaloneMediaLink(link);
+    if (!candidate) continue;
+    const { source, url, provider } = candidate;
     const fallback = `<figcaption><a href="${escape(source)}" rel="noopener noreferrer" data-blog-ui="videoSource">Open original video ↗</a></figcaption>`;
     if (provider) {
       html = html.replace(paragraph, `<figure class="blog-figure blog-video"><div class="blog-embed"><iframe src="${escape(provider.src)}" title="${provider.name} video player" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="fullscreen; picture-in-picture; encrypted-media" allowfullscreen></iframe></div>${fallback}</figure>`);

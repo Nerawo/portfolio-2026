@@ -158,6 +158,10 @@ export async function downloadImage(source, { fetcher = fetch } = {}) {
   throw new Error('Too many image redirects.');
 }
 
+// Hash-only upload alt metadata is not a human-readable automatic caption.
+// Keep the original alt attribute and all article prose unchanged.
+export const imageCaption = alt => /^[a-f0-9]{32}$/i.test((alt || '').trim()) ? '' : alt || '';
+
 export async function preparePosts(snapshot, config, { fetcher = fetch } = {}) {
   const selected = selectPosts(snapshot, config), assets = new Map(), cache = new Map(), videoCache = new Map();
   async function image(source) {
@@ -174,8 +178,8 @@ export async function preparePosts(snapshot, config, { fetcher = fetch } = {}) {
       sanitize(tag, { allowedTags: ['img'], allowedAttributes: { img: ['src', 'alt'] }, transformTags: { img: (tagName, attribs) => { attrs = attribs; return { tagName, attribs }; } } });
       if (!attrs?.src) { html = html.replace(tag, ''); continue; }
       const saved = await image(attrs.src);
-      const caption = attrs.alt || '';
-      html = html.replace(tag, `<figure class="blog-figure"><div class="case-inline-media"><img src="media/${saved.filename}" alt="${escape(caption)}" width="${saved.width}" height="${saved.height}" loading="lazy" decoding="async"></div>${caption ? `<figcaption>${escape(caption)}</figcaption>` : ''}</figure>`);
+      const caption = imageCaption(attrs.alt);
+      html = html.replace(tag, `<figure class="blog-figure"><div class="case-inline-media"><img src="media/${saved.filename}" alt="${escape(attrs.alt || '')}" width="${saved.width}" height="${saved.height}" loading="lazy" decoding="async"></div>${caption ? `<figcaption>${escape(caption)}</figcaption>` : ''}</figure>`);
     }
     // Block figures must not live inside a Markdown paragraph; split mixed text/image paragraphs safely.
     html = html.replace(/<p>([\s\S]*?)<\/p>/g, (whole, inside) => inside.includes('<figure') ? inside.split(/(<figure[\s\S]*?<\/figure>)/g).map(part => part.startsWith('<figure') ? part : part.trim() ? `<p>${part}</p>` : '').join('') : whole);
