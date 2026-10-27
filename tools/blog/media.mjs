@@ -114,8 +114,8 @@ function standaloneMediaLink(link) {
 function separateMediaLines(html) {
   return html.replace(/<p>([\s\S]*?)<\/p>/g, (paragraph, inside) => {
     const output = [], pending = []; let depth = 0, changed = false;
-    const flush = () => { if (pending.join('\n').trim()) output.push('<p>' + pending.join('\n') + '</p>'); pending.length = 0; };
-    for (const line of inside.split(/\r?\n/)) {
+    const flush = () => { if (pending.join('<br />\n').trim()) output.push('<p>' + pending.join('<br />\n') + '</p>'); pending.length = 0; };
+    for (const line of inside.split(/<br\s*\/?>[ \t]*(?:\r?\n)?|\r?\n/g)) {
       if (depth === 0 && /^<a\b[^>]*>[^<]*<\/a>$/.test(line.trim()) && standaloneMediaLink(line.trim())) {
         flush(); output.push('<p>' + line.trim() + '</p>'); changed = true;
       } else {

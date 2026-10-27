@@ -38,8 +38,9 @@ export function parseEditorial(body) {
 
 function markdownParser() {
   const headings = new Map();
-  const parser = new Marked({ gfm: true, breaks: false });
+  const parser = new Marked({ gfm: true, breaks: true });
   parser.use({ renderer: {
+    br() { return '<br />\n'; },
     html({ text }) {
       // GitHub's normal upload UI can emit an HTML img. Only that inert form survives.
       return sanitize(text, { allowedTags: ['img'], allowedAttributes: { img: ['src', 'alt', 'width', 'height'] }, allowedSchemes: ['https'], allowProtocolRelative: false });
@@ -182,7 +183,11 @@ export async function preparePosts(snapshot, config, { fetcher = fetch } = {}) {
       html = html.replace(tag, `<figure class="blog-figure"><div class="case-inline-media"><img src="media/${saved.filename}" alt="${escape(attrs.alt || '')}" width="${saved.width}" height="${saved.height}" loading="lazy" decoding="async"></div>${caption ? `<figcaption>${escape(caption)}</figcaption>` : ''}</figure>`);
     }
     // Block figures must not live inside a Markdown paragraph; split mixed text/image paragraphs safely.
-    html = html.replace(/<p>([\s\S]*?)<\/p>/g, (whole, inside) => inside.includes('<figure') ? inside.split(/(<figure[\s\S]*?<\/figure>)/g).map(part => part.startsWith('<figure') ? part : part.trim() ? `<p>${part}</p>` : '').join('') : whole);
+    html = html.replace(/<p>([\s\S]*?)<\/p>/g, (whole, inside) => inside.includes('<figure') ? inside.split(/(<figure[\s\S]*?<\/figure>)/g).map(part => {
+      if (part.startsWith('<figure')) return part;
+      const text = part.replace(/^(?:\s*<br\s*\/?>)+|(?:<br\s*\/?>\s*)+$/g, '').trim();
+      return text ? `<p>${text}</p>` : '';
+    }).join('') : whole);
     html = await renderMediaLinks(html, { fetcher, permittedUrl: permittedImage, assets, cache: videoCache });
     const summary = editorial.summary || plain(cleanMarkdown(editorial.markdown, post.url).replace(/<pre>[\s\S]*?<\/pre>/g, '')).slice(0, 180);
     const cover = editorial.cover ? await image(editorial.cover) : null;
