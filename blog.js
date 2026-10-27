@@ -20,6 +20,30 @@
     align();
     new ResizeObserver(align).observe(video);
   });
+  // No YouTube iframe or playback request exists until the reader activates Play.
+  document.querySelectorAll('.blog-prose .blog-youtube[data-youtube-id]').forEach(container => {
+    const id = container.dataset.youtubeId, button = container.querySelector('.blog-youtube-play'), thumbnail = button?.querySelector('img');
+    if (!/^[A-Za-z0-9_-]{11}$/.test(id || '') || !button || !thumbnail) return;
+    button.setAttribute('aria-label', zh ? '播放 YouTube 视频' : 'Play YouTube video');
+    let retried = false;
+    const retry = () => {
+      if (!retried) { retried = true; thumbnail.src = 'https://i.ytimg.com/vi/' + id + '/mqdefault.jpg'; }
+      else thumbnail.hidden = true;
+    };
+    thumbnail.addEventListener('error', retry);
+    thumbnail.addEventListener('load', () => { if (thumbnail.naturalWidth <= 120) retry(); });
+    if (thumbnail.complete && (!thumbnail.naturalWidth || thumbnail.naturalWidth <= 120)) retry();
+    button.addEventListener('click', () => {
+      const player = document.createElement('iframe');
+      player.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+      player.title = zh ? 'YouTube 视频播放器' : 'YouTube video player';
+      player.referrerPolicy = 'strict-origin-when-cross-origin';
+      player.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
+      player.allowFullscreen = true;
+      container.replaceChildren(player);
+      player.focus({ preventScroll: true });
+    }, { once: true });
+  });
   document.querySelectorAll('[data-blog-date]').forEach(node => { node.textContent = new Intl.DateTimeFormat(zh ? 'zh-CN' : 'en', { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(node.dateTime)); });
   const toggle = document.querySelector('.theme-toggle');
   const icons = '<svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg><svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.2A8.6 8.6 0 0 1 8.8 3.8 8.6 8.6 0 1 0 20.2 15.2Z"></path></svg>';

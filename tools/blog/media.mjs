@@ -21,7 +21,7 @@ export function providerVideo(source) {
     if (url.pathname === '/watch') id = url.searchParams.get('v');
     else id = url.pathname.match(/^\/(?:shorts|embed)\/([A-Za-z0-9_-]{11})\/?$/)?.[1];
   } else if (host === 'youtu.be') id = url.pathname.match(/^\/([A-Za-z0-9_-]{11})\/?$/)?.[1];
-  if (id && /^[A-Za-z0-9_-]{11}$/.test(id)) return { name: 'YouTube', src: `https://www.youtube-nocookie.com/embed/${id}` };
+  if (id && /^[A-Za-z0-9_-]{11}$/.test(id)) return { name: 'YouTube', id, src: `https://www.youtube-nocookie.com/embed/${id}` };
   if (['vimeo.com', 'www.vimeo.com', 'player.vimeo.com'].includes(host)) {
     const match = url.pathname.match(host === 'player.vimeo.com' ? /^\/video\/(\d{1,12})\/?$/ : /^\/(\d{1,12})(?:\/([a-f0-9]{6,64}))?\/?$/i);
     if (!match || /^0+$/.test(match[1])) return null;
@@ -134,7 +134,9 @@ export async function renderMediaLinks(html, { fetcher, permittedUrl, assets, ca
     if (!candidate) continue;
     const { source, url, provider } = candidate;
     const fallback = `<figcaption><a href="${escape(source)}" rel="noopener noreferrer" data-blog-ui="videoSource">Open original video ↗</a></figcaption>`;
-    if (provider) {
+    if (provider?.name === 'YouTube') {
+      html = html.replace(paragraph, `<figure class="blog-figure blog-video"><div class="blog-embed blog-youtube" data-youtube-id="${provider.id}"><button class="blog-youtube-play" type="button" aria-label="Play YouTube video"><img src="https://i.ytimg.com/vi/${provider.id}/hq720.jpg" alt="" width="1280" height="720" loading="lazy" referrerpolicy="no-referrer"><span class="blog-youtube-play-icon" aria-hidden="true"></span></button></div>${fallback}</figure>`);
+    } else if (provider) {
       html = html.replace(paragraph, `<figure class="blog-figure blog-video"><div class="blog-embed"><iframe src="${escape(provider.src)}" title="${provider.name} video player" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="fullscreen; picture-in-picture; encrypted-media" allowfullscreen></iframe></div>${fallback}</figure>`);
     } else if (githubAsset(url)) {
       if (!cache.has(source)) cache.set(source, downloadVideo(source, { fetcher, permittedUrl }).catch(error => { warn(`Blog attachment kept as a link (${url.pathname}): ${error.message}`); return null; }));

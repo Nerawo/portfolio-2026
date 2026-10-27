@@ -40,7 +40,7 @@ test('multiple isolated media lines split safely, cache validated bytes and leav
  let calls=0;
  const body=`**Introduction**\n${videoUrl}\nA following paragraph.\n${videoUrl}\n\nhttps://youtu.be/M7lc1UVf-VE\n\n[My video](${videoUrl})\n\nhttps://example.com/ordinary`;
  const {posts}=await preparePosts(snapshot(body),config,{fetcher:async(...args)=>{calls++;return fetcher(...args);}});
- assert.equal(calls,1);assert.equal((posts[0].html.match(/<video /g)||[]).length,2);assert(posts[0].html.includes('<p><strong>Introduction</strong></p>'));assert(posts[0].html.includes('<p>A following paragraph.</p>'));assert(posts[0].html.includes('youtube-nocookie.com/embed/M7lc1UVf-VE'));assert(posts[0].html.includes('>My video</a>'));assert(posts[0].html.includes('href="https://example.com/ordinary"'));assert(!/<p>\s*<figure/.test(posts[0].html));
+ assert.equal(calls,1);assert.equal((posts[0].html.match(/<video /g)||[]).length,2);assert(posts[0].html.includes('<p><strong>Introduction</strong></p>'));assert(posts[0].html.includes('<p>A following paragraph.</p>'));assert(posts[0].html.includes('data-youtube-id="M7lc1UVf-VE"'));assert(posts[0].html.includes('>My video</a>'));assert(posts[0].html.includes('href="https://example.com/ordinary"'));assert(!/<p>\s*<figure/.test(posts[0].html));
 });
 
 test('the actual rendered article retains its original fallback URL, source credit, image dimensions and stable route',async()=>{

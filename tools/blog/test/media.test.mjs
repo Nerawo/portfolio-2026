@@ -68,7 +68,7 @@ test('only standalone provider URLs embed; prose, code, ordinary and named links
   const body = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=5\n\nhttps://vimeo.com/76979871\n\nhttps://example.com/article\n\n[Watch](https://youtu.be/dQw4w9WgXcQ)\n\nHere is https://youtu.be/dQw4w9WgXcQ in a sentence.\n\n```\nhttps://youtu.be/dQw4w9WgXcQ\n```\n\n<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>\n\n<video src="https://evil.example/video.mp4" autoplay></video>';
   const { posts } = await preparePosts(snapshot(body), config, { fetcher: () => { throw new Error('Provider embeds must not make build-time requests.'); } });
   const html = posts[0].html;
-  assert.equal((html.match(/<iframe /g) || []).length, 2); assert(html.includes('youtube-nocookie.com/embed/')); assert(html.includes('dnt=1')); assert(html.includes('loading="lazy"')); assert(html.includes('href="https://example.com/article"')); assert(html.includes('>Watch</a>')); assert(html.includes('in a sentence.')); assert(html.includes('<pre><code>https://')); assert(!html.includes('<video')); assert(!html.includes('evil.example'));
+  assert.equal((html.match(/<iframe /g) || []).length, 1); assert(html.includes('data-youtube-id="dQw4w9WgXcQ"')); assert(html.includes('dnt=1')); assert(html.includes('loading="lazy"')); assert(html.includes('href="https://example.com/article"')); assert(html.includes('>Watch</a>')); assert(html.includes('in a sentence.')); assert(html.includes('<pre><code>https://')); assert(!html.includes('<video')); assert(!html.includes('evil.example'));
   assert(!cleanMarkdown(body, 'https://github.com/').includes('<iframe'));
 });
 
