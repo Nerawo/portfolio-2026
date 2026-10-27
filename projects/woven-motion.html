@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Project 鈥?Lu Zhang</title>
+  <title>Woven Motion — Lu Zhang</title>
+  <meta name="description" content="A pipeline that parses external pixel-art data and reconstructs it as a scalable, animated three-dimensional quilt.">
+  <meta property="og:title" content="Woven Motion — Lu Zhang">
+  <meta property="og:description" content="A pipeline that parses external pixel-art data and reconstructs it as a scalable, animated three-dimensional quilt.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://nerawo.github.io/portfolio-2026/projects/woven-motion.html">
+  <meta property="og:image" content="https://nerawo.github.io/portfolio-2026/file/woven-motion/AnimatedQuilt.gif">
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="../project.css" />
 </head>
@@ -12,20 +18,32 @@
     <a class="wordmark" href="../index.html">Lu Zhang</a>
     <nav aria-label="Primary navigation">
       <a href="../work.html">Work</a>
+      <a href="../blog.html">Blog</a>
       <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"></button>
       <details class="resume-menu">
         <summary>Resume</summary>
-        <div class="resume-options">
-          <a href="../file/resume/Lu_Zhang_Resume_02.pdf" target="_blank">English</a>
-          <a href="../file/resume/寮犵拹_绠€鍘哶02.pdf" target="_blank">涓枃</a>
-        </div>
+        <div class="resume-options"><a data-resume="en" href="../file/resume/Lu_Zhang_Resume_02.pdf" target="_blank" rel="noopener">English</a><a data-resume="zh" href="../file/resume/%E5%BC%A0%E7%92%90_%E7%AE%80%E5%8E%86_02.pdf" target="_blank" rel="noopener">中文</a></div>
       </details>
     </nav>
   </header>
-  <main class="project-main" id="project-root"></main>
+  <main class="project-main" id="project-root">
+    <div class="case-hero" data-media-orientation="landscape" data-ratio-source="dimensions" style="--hero-media-ratio: 4320 / 4320; --hero-media-aspect: 1; --hero-media-natural-width: 4320px">
+    <section class="case-header">
+      <p class="eyebrow">Case Study · February 2026</p><h1>Woven Motion</h1>
+      <div class="case-lede"><p>A pipeline that parses external pixel-art data and reconstructs it as a scalable, animated three-dimensional quilt.</p><div class="case-facts"><p><span>Role</span><span>Data-Driven Animation</span></p><p><span>Tools</span><span>Python · Maya</span></p><p><span>Date</span><span>February 2026</span></p></div></div>
+    </section>
+    <div class="case-hero-media"><video width="4320" height="4320" controls playsinline preload="none" poster="../file/woven-motion/AnimatedQuilt.gif"><source src="../file/woven-motion/AnimatedQuilt.mp4" type="video/mp4"></video></div>
+    </div>
+    <div class="case-body"><section class="case-section case-section--split"><div class="case-section-text"><div class="case-section-label">01 · Input</div><div class="case-section-copy"><h2>Parsing external pixel data</h2><p>Each .c file is parsed for frame count, width, height, and hexadecimal pixel values. Data is grouped by tile and organized into frame-based dictionaries.</p></div></div><div class="case-inline-media "><figure><img width="1800" height="1800" src="../file/breakdown-assets/woven-motion/frame-01.webp" alt="Source animation frame" loading="lazy" decoding="async"><figcaption>Source animation frame</figcaption></figure></div></section><section class="case-section case-section--text"><div class="case-section-text"><div class="case-section-label">02 · Palette</div><div class="case-section-copy"><h2>Shared materials across animation</h2><p>Hex colors are normalized to RGB and deduplicated into one shared palette per tile, allowing shaders to be reused across all frames.</p></div></div></section><section class="case-section case-section--diagram"><div class="case-section-text"><div class="case-section-label">03 · Reconstruction</div><div class="case-section-copy"><h2>From pixels to animated geometry</h2><p>The script builds geometry for each frame and uses visibility animation to reconstruct the source pixel art. Rows and columns expose the overall quilt layout.</p></div></div><div class="case-inline-media "><figure><img width="812" height="819" src="../file/breakdown-assets/woven-motion/layout.webp" alt="Procedural tile layout" loading="lazy" decoding="async"><figcaption>Procedural tile layout</figcaption></figure></div></section><section class="case-section case-section--diagram"><div class="case-section-text"><div class="case-section-label">04 · Debugging</div><div class="case-section-copy"><h2>Reliable frame generation</h2><p>An early return inside the construction loop stopped generation after one row. Moving the return outside the loop restored the full tile and clarified the pipeline's control flow.</p></div></div><div class="case-inline-media "><figure><img width="1094" height="890" src="../file/breakdown-assets/woven-motion/debugging.webp" alt="Animation build debugging" loading="lazy" decoding="async"><figcaption>Animation build debugging</figcaption></figure></div></section></div>
+    <nav class="case-project-nav" aria-label="Project navigation"><a href="newtons-cradle.html">← Previous project<strong>Newton’s Cradle</strong></a><a href="../work.html">All work</a><a href="yellowstone.html">Next project →<strong>Yellowstone</strong></a></nav>
+    <a class="case-next" href="yellowstone.html"><div><span>Next Project</span><strong>Yellowstone</strong></div><span class="arrow">↗</span></a></main>
   <script src="../i18n.js"></script>
+  <script src="../project-data.js"></script>
+  <script src="../image-sizes.js"></script>
   <script src="../project-page.js"></script>
   <script src="../project-zh.js"></script>
+  <script src="../project-hero.js"></script>
+  <script src="../site.js"></script>
 </body>
 </html>
 

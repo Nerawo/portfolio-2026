@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Project 鈥?Lu Zhang</title>
+  <title>Yellowstone — Lu Zhang</title>
+  <meta name="description" content="A cinematic real-time landscape study inspired by Yellowstone National Park, focused on terrain, natural composition, atmosphere, and lighting.">
+  <meta property="og:title" content="Yellowstone — Lu Zhang">
+  <meta property="og:description" content="A cinematic real-time landscape study inspired by Yellowstone National Park, focused on terrain, natural composition, atmosphere, and lighting.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://nerawo.github.io/portfolio-2026/projects/yellowstone.html">
+  <meta property="og:image" content="https://nerawo.github.io/portfolio-2026/file/yellow-stone/ss.jpg">
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="../project.css" />
 </head>
@@ -12,20 +18,32 @@
     <a class="wordmark" href="../index.html">Lu Zhang</a>
     <nav aria-label="Primary navigation">
       <a href="../work.html">Work</a>
+      <a href="../blog.html">Blog</a>
       <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"></button>
       <details class="resume-menu">
         <summary>Resume</summary>
-        <div class="resume-options">
-          <a href="../file/resume/Lu_Zhang_Resume_02.pdf" target="_blank">English</a>
-          <a href="../file/resume/寮犵拹_绠€鍘哶02.pdf" target="_blank">涓枃</a>
-        </div>
+        <div class="resume-options"><a data-resume="en" href="../file/resume/Lu_Zhang_Resume_02.pdf" target="_blank" rel="noopener">English</a><a data-resume="zh" href="../file/resume/%E5%BC%A0%E7%92%90_%E7%AE%80%E5%8E%86_02.pdf" target="_blank" rel="noopener">中文</a></div>
       </details>
     </nav>
   </header>
-  <main class="project-main" id="project-root"></main>
+  <main class="project-main" id="project-root">
+    <div class="case-hero" data-media-orientation="landscape" data-ratio-source="dimensions" style="--hero-media-ratio: 1920 / 1080; --hero-media-aspect: 1.7777777777777777; --hero-media-natural-width: 1920px">
+    <section class="case-header">
+      <p class="eyebrow">Case Study · May 2026</p><h1>Yellowstone</h1>
+      <div class="case-lede"><p>A cinematic real-time landscape study inspired by Yellowstone National Park, focused on terrain, natural composition, atmosphere, and lighting.</p><div class="case-facts"><p><span>Role</span><span>Real-Time Environment</span></p><p><span>Tools</span><span>Unreal Engine 5</span></p><p><span>Date</span><span>May 2026</span></p></div></div>
+    </section>
+    <div class="case-hero-media"><video width="1920" height="1080" controls playsinline preload="none" poster="../file/yellow-stone/ss.jpg"><source src="../file/yellow-stone/landscape-web.mp4" type="video/mp4"></video></div>
+    </div>
+    <div class="case-body"><section class="case-section case-section--text"><div class="case-section-text"><div class="case-section-label">01 · Environment</div><div class="case-section-copy"><h2>Building a readable wilderness composition</h2><p>Mountain silhouettes, water, vegetation, and foreground reeds are layered to create depth and lead the eye through the landscape.</p></div></div></section><section class="case-section case-section--text"><div class="case-section-text"><div class="case-section-label">02 · Lighting</div><div class="case-section-copy"><h2>Real-time atmosphere</h2><p>Directional light, sky contribution, fog, and reflection balance establish a calm cinematic time of day while preserving terrain readability.</p></div></div></section><section class="case-section case-section--text"><div class="case-section-text"><div class="case-section-label">03 · Output</div><div class="case-section-copy"><h2>A camera-led environment study</h2><p>The final animation uses a controlled camera path to present the environment as a coherent real-time sequence rather than a static scene.</p></div></div></section></div>
+    <nav class="case-project-nav" aria-label="Project navigation"><a href="woven-motion.html">← Previous project<strong>Woven Motion</strong></a><a href="../work.html">All work</a><a href="crimson-still-life.html">Next project →<strong>Crimson Still Life</strong></a></nav>
+    <a class="case-next" href="crimson-still-life.html"><div><span>Next Project</span><strong>Crimson Still Life</strong></div><span class="arrow">↗</span></a></main>
   <script src="../i18n.js"></script>
+  <script src="../project-data.js"></script>
+  <script src="../image-sizes.js"></script>
   <script src="../project-page.js"></script>
   <script src="../project-zh.js"></script>
+  <script src="../project-hero.js"></script>
+  <script src="../site.js"></script>
 </body>
 </html>
 

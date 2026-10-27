@@ -1,0 +1,16 @@
+{
+  "name": "portfolio-discussions-blog",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "sync": "node cli.mjs",
+    "empty-preview": "node cli.mjs --empty-preview"
+  },
+  "engines": { "node": ">=24" },
+  "dependencies": {
+    "marked": "^17.0.0",
+    "sanitize-html": "^2.17.0",
+    "image-size": "^2.0.2"
+  }
+}

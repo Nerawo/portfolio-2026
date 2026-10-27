@@ -1,0 +1,62 @@
+name: Sync Blog and deploy Pages
+
+on:
+  push:
+    branches: [main]
+  discussion:
+    types: [created, edited, deleted, category_changed, transferred]
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * *'
+
+concurrency:
+  group: portfolio-pages
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  build:
+    if: github.repository == 'Nerawo/portfolio-2026'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      discussions: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: tools/blog/package-lock.json
+      - name: Install build-only dependencies
+        run: npm ci --prefix tools/blog
+      - name: Verify sync and Markdown security
+        run: npm test --prefix tools/blog
+      - name: Fetch full Blog snapshot and build the complete site
+        run: node tools/blog/cli.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BLOG_CATEGORY_ID: ${{ vars.BLOG_CATEGORY_ID }}
+      - name: Upload complete site for Pages
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy the same generated site
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

@@ -8,3 +8,11 @@ tmp/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Unused local encoding experiment (source video is still used)
+file/wired-wings/ProceduralMotion-web.mp4
+
+# Blog dependencies and complete generated Pages artifact
+tools/blog/node_modules/
+dist/
+.blog-stage-*/

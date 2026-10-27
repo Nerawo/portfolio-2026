@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Project 鈥?Lu Zhang</title>
+  <title>Wired Wings — Lu Zhang</title>
+  <meta name="description" content="A procedural reconstruction of a kinetic installation, translating a complex mechanical armature into a controllable system of geometry, constraints, and analytical motion.">
+  <meta property="og:title" content="Wired Wings — Lu Zhang">
+  <meta property="og:description" content="A procedural reconstruction of a kinetic installation, translating a complex mechanical armature into a controllable system of geometry, constraints, and analytical motion.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://nerawo.github.io/portfolio-2026/projects/wired-wings.html">
+  <meta property="og:image" content="https://nerawo.github.io/portfolio-2026/file/wired-wings/ProceduralMotion.jpg">
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="../project.css" />
 </head>
@@ -12,20 +18,32 @@
     <a class="wordmark" href="../index.html">Lu Zhang</a>
     <nav aria-label="Primary navigation">
       <a href="../work.html">Work</a>
+      <a href="../blog.html">Blog</a>
       <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"></button>
       <details class="resume-menu">
         <summary>Resume</summary>
-        <div class="resume-options">
-          <a href="../file/resume/Lu_Zhang_Resume_02.pdf" target="_blank">English</a>
-          <a href="../file/resume/寮犵拹_绠€鍘哶02.pdf" target="_blank">涓枃</a>
-        </div>
+        <div class="resume-options"><a data-resume="en" href="../file/resume/Lu_Zhang_Resume_02.pdf" target="_blank" rel="noopener">English</a><a data-resume="zh" href="../file/resume/%E5%BC%A0%E7%92%90_%E7%AE%80%E5%8E%86_02.pdf" target="_blank" rel="noopener">中文</a></div>
       </details>
     </nav>
   </header>
-  <main class="project-main" id="project-root"></main>
+  <main class="project-main" id="project-root">
+    <div class="case-hero case-hero--portrait" data-media-orientation="portrait" data-ratio-source="dimensions" style="--hero-media-ratio: 1080 / 1920; --hero-media-aspect: 0.5625; --hero-media-natural-width: 1080px">
+    <section class="case-header">
+      <p class="eyebrow">Case Study · May 2026</p><h1>Wired Wings</h1>
+      <div class="case-lede"><p>A procedural reconstruction of a kinetic installation, translating a complex mechanical armature into a controllable system of geometry, constraints, and analytical motion.</p><div class="case-facts"><p><span>Role</span><span>Procedural Modeling & Animation</span></p><p><span>Tools</span><span>Houdini · Karma XPU</span></p><p><span>Date</span><span>May 2026</span></p></div></div>
+    </section>
+    <div class="case-hero-media"><video width="1080" height="1920" controls playsinline preload="none" poster="../file/wired-wings/ProceduralMotion.jpg"><source src="../file/wired-wings/ProceduralMotion.mp4" type="video/mp4"></video></div>
+    </div>
+    <div class="case-body"><section class="case-section case-section--wide"><div class="case-section-text"><div class="case-section-label">01 · Challenge</div><div class="case-section-copy"><h2>Mechanical motion, rebuilt as a system</h2><p>The sculpture combines paper wings, steel-wire arms, circular joints, and counterweights. The goal was to preserve the character of the original installation while making every repeated unit procedural and animation-ready.</p></div></div><div class="case-inline-media "><figure><img width="1800" height="1564" src="../file/breakdown-assets/wired-wings/reference.webp" alt="Reference and procedural reconstruction" loading="lazy" decoding="async"><figcaption>Reference and procedural reconstruction</figcaption></figure></div></section><section class="case-section case-section--diagram"><div class="case-section-text"><div class="case-section-label">02 · Controller</div><div class="case-section-copy"><h2>Cam–follower mechanism</h2><p>A continuously rotating cam drives an oscillating follower arm. The cam center is evaluated each frame, while atan2 and acos solve the tangent angle required to orient the follower against the circle.</p><p>This converts continuous rotation into the rhythmic swing that powers the wing system.</p></div></div><div class="case-inline-media "><figure><img width="942" height="854" src="../file/breakdown-assets/wired-wings/controller.webp" alt="Cam-follower controller setup" loading="lazy" decoding="async"><figcaption>Cam-follower controller setup</figcaption></figure></div></section><section class="case-section case-section--diagram"><div class="case-section-text"><div class="case-section-label">03 · Linkage</div><div class="case-section-copy"><h2>Analytical triangle solution</h2><p>Wing attachment points and ring joints form a fixed-length triangle linkage. Each frame, the law of cosines resolves the world-space rotation of the connected arms as the driven point moves.</p></div></div><div class="case-inline-media "><figure><img width="751" height="646" src="../file/breakdown-assets/wired-wings/linkage.webp" alt="Analytical linkage construction" loading="lazy" decoding="async"><figcaption>Analytical linkage construction</figcaption></figure></div></section><section class="case-section case-section--split"><div class="case-section-text"><div class="case-section-label">04 · Result</div><div class="case-section-copy"><h2>A reusable kinetic assembly</h2><p>Intersection Analysis extracts stable contact points regardless of rotation. The completed setup generates synchronized flapping motion with approximately 322,000 polygons and a render time of about 1.8 minutes per frame.</p></div></div><div class="case-inline-media "><figure><img width="1355" height="809" src="../file/breakdown-assets/wired-wings/system.webp" alt="Endpoint and suspension system" loading="lazy" decoding="async"><figcaption>Endpoint and suspension system</figcaption></figure></div></section></div>
+    <nav class="case-project-nav" aria-label="Project navigation"><a href="when-the-rain-speaks.html">← Previous project<strong>When the Rain Speaks</strong></a><a href="../work.html">All work</a><a href="procedural-building.html">Next project →<strong>Procedural Building</strong></a></nav>
+    <a class="case-next" href="procedural-building.html"><div><span>Next Project</span><strong>Procedural Building</strong></div><span class="arrow">↗</span></a></main>
   <script src="../i18n.js"></script>
+  <script src="../project-data.js"></script>
+  <script src="../image-sizes.js"></script>
   <script src="../project-page.js"></script>
   <script src="../project-zh.js"></script>
+  <script src="../project-hero.js"></script>
+  <script src="../site.js"></script>
 </body>
 </html>
 

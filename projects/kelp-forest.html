@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Project 鈥?Lu Zhang</title>
+  <title>Kelp Forest — Lu Zhang</title>
+  <meta name="description" content="A dense underwater ecosystem combining procedural kelp, simulated fish schools, terrain, water volume, and atmospheric lighting.">
+  <meta property="og:title" content="Kelp Forest — Lu Zhang">
+  <meta property="og:description" content="A dense underwater ecosystem combining procedural kelp, simulated fish schools, terrain, water volume, and atmospheric lighting.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://nerawo.github.io/portfolio-2026/projects/kelp-forest.html">
+  <meta property="og:image" content="https://nerawo.github.io/portfolio-2026/file/kelp-forest/kelp.jpg">
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="../project.css" />
 </head>
@@ -12,20 +18,32 @@
     <a class="wordmark" href="../index.html">Lu Zhang</a>
     <nav aria-label="Primary navigation">
       <a href="../work.html">Work</a>
+      <a href="../blog.html">Blog</a>
       <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"></button>
       <details class="resume-menu">
         <summary>Resume</summary>
-        <div class="resume-options">
-          <a href="../file/resume/Lu_Zhang_Resume_02.pdf" target="_blank">English</a>
-          <a href="../file/resume/寮犵拹_绠€鍘哶02.pdf" target="_blank">涓枃</a>
-        </div>
+        <div class="resume-options"><a data-resume="en" href="../file/resume/Lu_Zhang_Resume_02.pdf" target="_blank" rel="noopener">English</a><a data-resume="zh" href="../file/resume/%E5%BC%A0%E7%92%90_%E7%AE%80%E5%8E%86_02.pdf" target="_blank" rel="noopener">中文</a></div>
       </details>
     </nav>
   </header>
-  <main class="project-main" id="project-root"></main>
+  <main class="project-main" id="project-root">
+    <div class="case-hero case-hero--portrait" data-media-orientation="portrait" data-ratio-source="dimensions" style="--hero-media-ratio: 1080 / 1620; --hero-media-aspect: 0.6666666666666666; --hero-media-natural-width: 1080px">
+    <section class="case-header">
+      <p class="eyebrow">Case Study · April 2026</p><h1>Kelp Forest</h1>
+      <div class="case-lede"><p>A dense underwater ecosystem combining procedural kelp, simulated fish schools, terrain, water volume, and atmospheric lighting.</p><div class="case-facts"><p><span>Role</span><span>Procedural Environment & FX</span></p><p><span>Tools</span><span>Houdini · Karma</span></p><p><span>Date</span><span>April 2026</span></p></div></div>
+    </section>
+    <div class="case-hero-media"><video width="1080" height="1620" controls playsinline preload="none" poster="../file/kelp-forest/kelp.jpg"><source src="../file/kelp-forest/kelp-web.mp4" type="video/mp4"></video></div>
+    </div>
+    <div class="case-body"><section class="case-section case-section--diagram"><div class="case-section-text"><div class="case-section-label">01 · Kelp</div><div class="case-section-copy"><h2>Organic form through reusable controls</h2><p>Two ramps control leaf width, taper, waviness, and irregularity. The procedural leaf feeds an L-system that generates multiple kelp structures for scattering.</p></div></div><div class="case-inline-media "><figure><img width="813" height="457" src="../file/breakdown-assets/kelp-forest/leaf-network.webp" alt="Procedural kelp leaf network" loading="lazy" decoding="async"><figcaption>Procedural kelp leaf network</figcaption></figure></div></section><section class="case-section case-section--text"><div class="case-section-text"><div class="case-section-label">02 · Distribution</div><div class="case-section-copy"><h2>Variation at environment scale</h2><p>Points scattered across the height field receive randomized variant attributes before Copy to Points distributes five kelp variations throughout the scene.</p></div></div></section><section class="case-section case-section--diagram"><div class="case-section-text"><div class="case-section-label">03 · Fish</div><div class="case-section-copy"><h2>POP-driven schooling motion</h2><p>Particles emitted from a circular source are shaped by drag, axis force, and attribute noise. Trails become curves, and sweep operations construct procedural fish bodies and tails aligned to the simulation.</p></div></div><div class="case-inline-media "><figure><img width="580" height="543" src="../file/breakdown-assets/kelp-forest/fish-system.webp" alt="POP fish-school system" loading="lazy" decoding="async"><figcaption>POP fish-school system</figcaption></figure></div></section><section class="case-section case-section--diagram"><div class="case-section-text"><div class="case-section-label">04 · Atmosphere</div><div class="case-section-copy"><h2>Depth through volume and light</h2><p>A HeightField forms the terrain, an extruded mountain grid forms the water volume, and VDB fog creates falloff. The final scene contains about 39.1 million polygons and 1.2 million curves.</p></div></div><div class="case-inline-media "><figure><img width="842" height="403" src="../file/breakdown-assets/kelp-forest/environment-network.webp" alt="Environment and volume network" loading="lazy" decoding="async"><figcaption>Environment and volume network</figcaption></figure></div></section></div>
+    <nav class="case-project-nav" aria-label="Project navigation"><a href="ember-field.html">← Previous project<strong>Ember Field</strong></a><a href="../work.html">All work</a><a href="steam-clock-integration.html">Next project →<strong>Steam Clock Integration</strong></a></nav>
+    <a class="case-next" href="steam-clock-integration.html"><div><span>Next Project</span><strong>Steam Clock Integration</strong></div><span class="arrow">↗</span></a></main>
   <script src="../i18n.js"></script>
+  <script src="../project-data.js"></script>
+  <script src="../image-sizes.js"></script>
   <script src="../project-page.js"></script>
   <script src="../project-zh.js"></script>
+  <script src="../project-hero.js"></script>
+  <script src="../site.js"></script>
 </body>
 </html>
 

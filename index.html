@@ -12,13 +12,11 @@
     <a class="wordmark" href="#top">Lu Zhang</a>
     <nav aria-label="Primary navigation">
       <a href="work.html">Work</a>
+      <a href="blog.html">Blog</a>
       <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"></button>
       <details class="resume-menu">
         <summary>Resume</summary>
-        <div class="resume-options">
-          <a href="file/resume/Lu_Zhang_Resume_02.pdf" target="_blank">English</a>
-          <a href="file/resume/张璐_简历_02.pdf" target="_blank">中文</a>
-        </div>
+        <div class="resume-options"><a data-resume="en" href="file/resume/Lu_Zhang_Resume_02.pdf" target="_blank" rel="noopener">English</a><a data-resume="zh" href="file/resume/%E5%BC%A0%E7%92%90_%E7%AE%80%E5%8E%86_02.pdf" target="_blank" rel="noopener">中文</a></div>
       </details>
     </nav>
   </header>
@@ -27,13 +25,13 @@
     <section class="hero" aria-labelledby="hero-title" data-frame-count="48">
       <div class="hero-stage">
         <div class="hero-media">
-          <img id="hero-scroll-frame" src="file/home_page/building-frames/frame-01.jpg" alt="Procedural building animation" />
+          <img id="hero-scroll-frame" src="file/home_page/building-frames-web/desktop/frame-01.webp" srcset="file/home_page/building-frames-web/mobile/frame-01.webp 960w, file/home_page/building-frames-web/desktop/frame-01.webp 1920w" sizes="100vw" fetchpriority="high" width="1920" height="1080" alt="Procedural building animation" />
         </div>
         <div class="hero-copy">
           <p class="eyebrow">Lu Zhang · Technical Artist</p>
           <h1 id="hero-title">Procedural systems.<br />Visual impact.</h1>
           <p class="intro">Houdini FX, artist tools, and real-time workflows.</p>
-          <a class="text-link" href="work.html">View all works <span>↗</span></a>
+          <div class="hero-actions"><a class="text-link reel-link" href="#demo-reel">Play Reel · 31s ↓</a><a class="text-link hero-work-link" href="work.html">Explore Work ↗</a></div>
         </div>
         <div class="frame-indicator" aria-hidden="true"><span id="current-frame">01</span> / 48</div>
       </div>
@@ -44,7 +42,7 @@
         <p class="eyebrow" id="reel-title">Demo Reel · 2026</p>
       </div>
       <div class="reel-player">
-        <video controls playsinline preload="metadata" poster="file/wired-wings/ProceduralMotion.jpg">
+        <video controls playsinline preload="none" poster="file/wired-wings/ProceduralMotion.jpg">
           <source src="file/home_page/reel_05.mp4" type="video/mp4" />
           Your browser does not support embedded video.
         </video>
@@ -59,7 +57,12 @@
       <div class="section-heading">
         <p class="eyebrow" id="work-title">Selected Projects</p>
       </div>
-      <div class="project-list" id="project-list"></div>
+      <div class="project-list" id="project-list"><a class="project" href="projects/wired-wings.html"><div class="project-row"><img class="project-thumbnail" src="file/web-images/wired-wings-640.webp" alt="" loading="lazy" width="320" height="240"><span class="project-index">01</span><h3>Wired Wings</h3><p class="project-summary">A procedural kinetic sculpture driven by analytical cam, follower, and linkage systems.</p><time>May 2026</time><span class="project-arrow">↗</span></div></a>
+<a class="project" href="projects/procedural-building.html"><div class="project-row"><img class="project-thumbnail" src="file/web-images/procedural-building-640.webp" alt="" loading="lazy" width="320" height="240"><span class="project-index">02</span><h3>Procedural Building</h3><p class="project-summary">A parameter-driven building generator with automated floors, facade elements, and materials.</p><time>April 2026</time><span class="project-arrow">↗</span></div></a>
+<a class="project" href="projects/ember-field.html"><div class="project-row"><img class="project-thumbnail" src="file/web-images/ember-field-640.webp" alt="" loading="lazy" width="320" height="240"><span class="project-index">03</span><h3>Ember Field</h3><p class="project-summary">An artist-facing procedural scattering tool for generating modular campfire environments.</p><time>March 2026</time><span class="project-arrow">↗</span></div></a>
+<a class="project" href="projects/kelp-forest.html"><div class="project-row"><img class="project-thumbnail" src="file/web-images/kelp-forest-640.webp" alt="" loading="lazy" width="320" height="240"><span class="project-index">04</span><h3>Kelp Forest</h3><p class="project-summary">A procedural underwater environment with L-system kelp, POP fish, and volumetric depth.</p><time>April 2026</time><span class="project-arrow">↗</span></div></a>
+<a class="project" href="projects/steam-clock-integration.html"><div class="project-row"><img class="project-thumbnail" src="file/web-images/steam-clock-integration-640.webp" alt="" loading="lazy" width="320" height="240"><span class="project-index">05</span><h3>Steam Clock Integration</h3><p class="project-summary">A live-action VFX integration using tracked cameras, CG rendering, Pyro, fog, and compositing.</p><time>March 2026</time><span class="project-arrow">↗</span></div></a>
+<a class="project" href="projects/newtons-cradle.html"><div class="project-row"><img class="project-thumbnail" src="file/web-images/newtons-cradle-640.webp" alt="" loading="lazy" width="320" height="240"><span class="project-index">06</span><h3>Newton’s Cradle</h3><p class="project-summary">A modular procedural scene with automatic alignment, shaders, and seamless oscillating motion.</p><time>February 2026</time><span class="project-arrow">↗</span></div></a></div>
       <div class="all-work-link">
         <a class="text-link" href="work.html">View all works <span>↗</span></a>
       </div>
@@ -90,6 +93,8 @@
   </footer>
 
   <script src="i18n.js"></script>
+  <script src="project-data.js"></script>
   <script src="script.js"></script>
+  <script src="site.js"></script>
 </body>
 </html>

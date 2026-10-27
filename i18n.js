@@ -1,5 +1,5 @@
 const languageDefaultVersion = "browser-language-v1";
-if (localStorage.getItem("portfolio-language-version") !== languageDefaultVersion) {
+if (!["en", "zh"].includes(localStorage.getItem("portfolio-language"))) {
   const browserLanguage = navigator.languages?.[0] || navigator.language || "en";
   const detectedLanguage = /^zh(?:-|$)/i.test(browserLanguage) ? "zh" : "en";
   localStorage.setItem("portfolio-language", detectedLanguage);
@@ -10,7 +10,7 @@ document.documentElement.lang = portfolioLang === "zh" ? "zh-CN" : "en";
 document.documentElement.dataset.lang = portfolioLang;
 
 const themeDefaultVersion = "dark-default-v1";
-if (localStorage.getItem("portfolio-theme-version") !== themeDefaultVersion) {
+if (!["dark", "light"].includes(localStorage.getItem("portfolio-theme"))) {
   localStorage.setItem("portfolio-theme", "dark");
   localStorage.setItem("portfolio-theme-version", themeDefaultVersion);
 }
@@ -19,6 +19,7 @@ document.documentElement.dataset.theme = localStorage.getItem("portfolio-theme")
 const staticTranslations = {
   zh: {
     "nav a[href$='work.html']": "作品",
+    "nav a[href$='blog.html']": "博客",
     "nav a[href$='index.html']": "首页",
     ".resume-menu summary": "简历",
     ".resume-options a:first-child": "英文简历",
@@ -26,7 +27,8 @@ const staticTranslations = {
     ".hero .eyebrow": "Lu Zhang · 技术美术",
     "#hero-title": "构建程序化系统，\n创造视觉表现。",
     ".hero .intro": "专注 Houdini FX、艺术家工具与实时制作流程。",
-    ".hero .text-link": "查看全部作品 →",
+    ".hero .hero-work-link": "查看作品 ↗",
+    ".hero .reel-link": "播放作品集锦 · 31 秒 ↓",
     "#reel-title": "作品集锦 · 2026",
     ".reel-meta p:first-child": "技术美术 · 程序化特效 · 工具开发",
     "#work-title": "精选项目",
@@ -62,7 +64,7 @@ if (portfolioLang === "zh") {
   if (count) count.innerHTML = `<span id="project-count">12</span> 个项目`;
 }
 
-document.querySelectorAll("nav").forEach(nav => {
+document.querySelectorAll(".site-header nav").forEach(nav => {
   if (nav.querySelector(".language-toggle")) return;
   const button = document.createElement("button");
   button.className = "language-toggle";

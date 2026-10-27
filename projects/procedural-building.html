@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Project 鈥?Lu Zhang</title>
+  <title>Procedural Building — Lu Zhang</title>
+  <meta name="description" content="A customizable apartment-building generator inspired by The Bowery in Savannah, with parameters for massing, floors, facade modules, roof details, and materials.">
+  <meta property="og:title" content="Procedural Building — Lu Zhang">
+  <meta property="og:description" content="A customizable apartment-building generator inspired by The Bowery in Savannah, with parameters for massing, floors, facade modules, roof details, and materials.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://nerawo.github.io/portfolio-2026/projects/procedural-building.html">
+  <meta property="og:image" content="https://nerawo.github.io/portfolio-2026/file/procedural-building/render_1.jpg">
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="../project.css" />
 </head>
@@ -12,20 +18,32 @@
     <a class="wordmark" href="../index.html">Lu Zhang</a>
     <nav aria-label="Primary navigation">
       <a href="../work.html">Work</a>
+      <a href="../blog.html">Blog</a>
       <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"></button>
       <details class="resume-menu">
         <summary>Resume</summary>
-        <div class="resume-options">
-          <a href="../file/resume/Lu_Zhang_Resume_02.pdf" target="_blank">English</a>
-          <a href="../file/resume/寮犵拹_绠€鍘哶02.pdf" target="_blank">涓枃</a>
-        </div>
+        <div class="resume-options"><a data-resume="en" href="../file/resume/Lu_Zhang_Resume_02.pdf" target="_blank" rel="noopener">English</a><a data-resume="zh" href="../file/resume/%E5%BC%A0%E7%92%90_%E7%AE%80%E5%8E%86_02.pdf" target="_blank" rel="noopener">中文</a></div>
       </details>
     </nav>
   </header>
-  <main class="project-main" id="project-root"></main>
+  <main class="project-main" id="project-root">
+    <div class="case-hero" data-media-orientation="landscape" data-ratio-source="dimensions" style="--hero-media-ratio: 1920 / 1080; --hero-media-aspect: 1.7777777777777777; --hero-media-natural-width: 1920px">
+    <section class="case-header">
+      <p class="eyebrow">Case Study · April 2026</p><h1>Procedural Building</h1>
+      <div class="case-lede"><p>A customizable apartment-building generator inspired by The Bowery in Savannah, with parameters for massing, floors, facade modules, roof details, and materials.</p><div class="case-facts"><p><span>Role</span><span>Procedural Modeling</span></p><p><span>Tools</span><span>Houdini · Karma CPU</span></p><p><span>Date</span><span>April 2026</span></p></div></div>
+    </section>
+    <div class="case-hero-media"><video width="1920" height="1080" controls playsinline preload="none" poster="../file/procedural-building/render_1.jpg"><source src="../file/procedural-building/cut-web.mp4" type="video/mp4"></video></div>
+    </div>
+    <div class="case-body"><section class="case-section case-section--split"><div class="case-section-text"><div class="case-section-label">01 · Controls</div><div class="case-section-copy"><h2>Artist-friendly building parameters</h2><p>Width, height, depth, floor height, column spacing, window width, door width, and balcony height expose the major design decisions without requiring node-level edits.</p></div></div><div class="case-inline-media "><figure><img width="815" height="281" src="../file/breakdown-assets/procedural-building/parameters.webp" alt="Exposed building parameters" loading="lazy" decoding="async"><figcaption>Exposed building parameters</figcaption></figure></div></section><section class="case-section case-section--wide"><div class="case-section-text"><div class="case-section-label">02 · Generation</div><div class="case-section-copy"><h2>One network, multiple floor types</h2><p>A foreach loop stacks floors along the vertical axis. Iteration-aware expressions distinguish the ground, middle, and top floors inside one compact procedural network.</p></div></div><div class="case-inline-media "><figure><img width="1545" height="799" src="../file/breakdown-assets/procedural-building/floor-types.webp" alt="Procedural floor-type assembly" loading="lazy" decoding="async"><figcaption>Procedural floor-type assembly</figcaption></figure></div></section><section class="case-section case-section--split"><div class="case-section-text"><div class="case-section-label">03 · Placement</div><div class="case-section-copy"><h2>Rule-based facade assembly</h2><p>Line, Delete, and Copy to Points workflows place windows, doors, and columns. Element counts respond automatically when the building dimensions change.</p></div></div><div class="case-inline-media "><figure><img width="1495" height="395" src="../file/breakdown-assets/procedural-building/combined-body.webp" alt="Combined building body" loading="lazy" decoding="async"><figcaption>Combined building body</figcaption></figure></div></section><section class="case-section case-section--diagram"><div class="case-section-text"><div class="case-section-label">04 · Materials</div><div class="case-section-copy"><h2>Attribute-driven assignment</h2><p>Name attributes are embedded as components are created, converted into primitive groups after merging, and used for automatic material assignment. The final building contains roughly 47,000 primitives.</p></div></div><div class="case-inline-media "><figure><img width="1536" height="543" src="../file/breakdown-assets/procedural-building/network.webp" alt="Houdini network organization" loading="lazy" decoding="async"><figcaption>Houdini network organization</figcaption></figure></div></section></div>
+    <nav class="case-project-nav" aria-label="Project navigation"><a href="wired-wings.html">← Previous project<strong>Wired Wings</strong></a><a href="../work.html">All work</a><a href="ember-field.html">Next project →<strong>Ember Field</strong></a></nav>
+    <a class="case-next" href="ember-field.html"><div><span>Next Project</span><strong>Ember Field</strong></div><span class="arrow">↗</span></a></main>
   <script src="../i18n.js"></script>
+  <script src="../project-data.js"></script>
+  <script src="../image-sizes.js"></script>
   <script src="../project-page.js"></script>
   <script src="../project-zh.js"></script>
+  <script src="../project-hero.js"></script>
+  <script src="../site.js"></script>
 </body>
 </html>
 

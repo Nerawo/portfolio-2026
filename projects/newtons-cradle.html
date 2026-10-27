@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Project 鈥?Lu Zhang</title>
+  <title>Newton’s Cradle — Lu Zhang</title>
+  <meta name="description" content="A fully scripted Maya scene combining modular character construction, automatic alignment, procedural shading, and seamless expression-driven motion.">
+  <meta property="og:title" content="Newton’s Cradle — Lu Zhang">
+  <meta property="og:description" content="A fully scripted Maya scene combining modular character construction, automatic alignment, procedural shading, and seamless expression-driven motion.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://nerawo.github.io/portfolio-2026/projects/newtons-cradle.html">
+  <meta property="og:image" content="https://nerawo.github.io/portfolio-2026/file/newtons-cradle/NewtonsCradle.jpg">
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="../project.css" />
 </head>
@@ -12,20 +18,32 @@
     <a class="wordmark" href="../index.html">Lu Zhang</a>
     <nav aria-label="Primary navigation">
       <a href="../work.html">Work</a>
+      <a href="../blog.html">Blog</a>
       <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"></button>
       <details class="resume-menu">
         <summary>Resume</summary>
-        <div class="resume-options">
-          <a href="../file/resume/Lu_Zhang_Resume_02.pdf" target="_blank">English</a>
-          <a href="../file/resume/寮犵拹_绠€鍘哶02.pdf" target="_blank">涓枃</a>
-        </div>
+        <div class="resume-options"><a data-resume="en" href="../file/resume/Lu_Zhang_Resume_02.pdf" target="_blank" rel="noopener">English</a><a data-resume="zh" href="../file/resume/%E5%BC%A0%E7%92%90_%E7%AE%80%E5%8E%86_02.pdf" target="_blank" rel="noopener">中文</a></div>
       </details>
     </nav>
   </header>
-  <main class="project-main" id="project-root"></main>
+  <main class="project-main" id="project-root">
+    <div class="case-hero" data-media-orientation="landscape" data-ratio-source="dimensions" style="--hero-media-ratio: 1280 / 720; --hero-media-aspect: 1.7777777777777777; --hero-media-natural-width: 1280px">
+    <section class="case-header">
+      <p class="eyebrow">Case Study · February 2026</p><h1>Newton’s Cradle</h1>
+      <div class="case-lede"><p>A fully scripted Maya scene combining modular character construction, automatic alignment, procedural shading, and seamless expression-driven motion.</p><div class="case-facts"><p><span>Role</span><span>Procedural Animation</span></p><p><span>Tools</span><span>Python · Maya</span></p><p><span>Date</span><span>February 2026</span></p></div></div>
+    </section>
+    <div class="case-hero-media"><video width="1280" height="720" controls playsinline preload="none" poster="../file/newtons-cradle/NewtonsCradle.jpg"><source src="../file/newtons-cradle/NewtonsCradle-web.mp4" type="video/mp4"></video></div>
+    </div>
+    <div class="case-body"><section class="case-section case-section--wide"><div class="case-section-text"><div class="case-section-label">01 · Architecture</div><div class="case-section-copy"><h2>A scene generated from modular functions</h2><p>Separate Python functions build bodies, heads, hair, legs, frames, grass, lights, shaders, cameras, and render settings. A single main function assembles the final scene.</p></div></div><div class="case-inline-media two-up"><figure><img width="1097" height="917" src="../file/breakdown-assets/newtons-cradle/character.webp" alt="Procedural character construction" loading="lazy" decoding="async"><figcaption>Procedural character construction</figcaption></figure><figure><img width="584" height="318" src="../file/breakdown-assets/newtons-cradle/code.webp" alt="Python system structure" loading="lazy" decoding="async"><figcaption>Python system structure</figcaption></figure></div></section><section class="case-section case-section--text"><div class="case-section-text"><div class="case-section-label">02 · Alignment</div><div class="case-section-copy"><h2>Bounding-box-driven placement</h2><p>World-space bounding boxes measure character and support geometry. Their extents determine proportional scale and centered placement without manual offsets.</p></div></div></section><section class="case-section case-section--text"><div class="case-section-text"><div class="case-section-label">03 · Motion</div><div class="case-section-copy"><h2>A mathematically seamless loop</h2><p>Sine expressions use a configurable total frame count. Completing one full sine cycle across the range guarantees that the end state returns to the start state.</p></div></div></section><section class="case-section case-section--diagram"><div class="case-section-text"><div class="case-section-label">04 · Reuse</div><div class="case-section-copy"><h2>Parameterized character behavior</h2><p>Reverse and single parameters control direction and whether a character includes the swing structure. Procedural Arnold shaders combine Standard Surface, noise, and ramp nodes without image textures.</p></div></div><div class="case-inline-media "><figure><img width="441" height="273" src="../file/breakdown-assets/newtons-cradle/shaders.webp" alt="Generated shader library" loading="lazy" decoding="async"><figcaption>Generated shader library</figcaption></figure></div></section></div>
+    <nav class="case-project-nav" aria-label="Project navigation"><a href="steam-clock-integration.html">← Previous project<strong>Steam Clock Integration</strong></a><a href="../work.html">All work</a><a href="woven-motion.html">Next project →<strong>Woven Motion</strong></a></nav>
+    <a class="case-next" href="woven-motion.html"><div><span>Next Project</span><strong>Woven Motion</strong></div><span class="arrow">↗</span></a></main>
   <script src="../i18n.js"></script>
+  <script src="../project-data.js"></script>
+  <script src="../image-sizes.js"></script>
   <script src="../project-page.js"></script>
   <script src="../project-zh.js"></script>
+  <script src="../project-hero.js"></script>
+  <script src="../site.js"></script>
 </body>
 </html>
 

@@ -24,7 +24,7 @@ if (document.documentElement.dataset.lang === "zh") {
       section.querySelector(".case-section-label").textContent = content[0];
       section.querySelector("h2").textContent = content[1];
       const paragraphs = section.querySelectorAll(".case-section-copy > p");
-      paragraphs.forEach((p, n) => { p.textContent = n ? "" : content[2]; });
+      paragraphs.forEach((p, n) => { if(n) p.remove(); else p.textContent = content[2]; });
     });
   }
   const labels = document.querySelectorAll(".case-facts p span:first-child");
