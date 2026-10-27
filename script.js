@@ -16,7 +16,7 @@ function updateHeroFrame() {
   frameRequest = null;
   const rect = hero.getBoundingClientRect();
   // Finish while the lower part of the building is still visible, independent of viewport height.
-  const distance = Math.max(1, hero.offsetHeight - 200);
+  const distance = Math.max(1, (hero.offsetHeight - 200) * 0.8);
   targetFrame = motionPreference.matches ? 0 : Math.round(Math.min(1,Math.max(0,-rect.top/distance)) * (HERO_FRAME_COUNT-1));
   const candidates = [...readyFrames.keys()].sort((a,b)=>Math.abs(a-targetFrame)-Math.abs(b-targetFrame));
   const frame = readyFrames.has(targetFrame) ? targetFrame : candidates[0];
