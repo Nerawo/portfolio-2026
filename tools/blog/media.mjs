@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import sanitize from 'sanitize-html';
+import { gettyVideo, gettyThumbnail } from './getty.mjs';
 
 const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const githubAsset = url => url.hostname === 'github.com' && /^\/user-attachments\/assets\/[a-f0-9-]+\/?$/i.test(url.pathname);
@@ -106,7 +107,7 @@ function standaloneMediaLink(link) {
   const url = secureUrl(source);
   if (!url || !label || secureUrl(label.replaceAll('&amp;', '&'))?.href !== url.href) return null;
   const provider = providerVideo(source);
-  return provider || githubAsset(url) ? { source, url, provider } : null;
+  return provider || githubAsset(url) || gettyVideo(source) ? { source, url, provider } : null;
 }
 
 // A Markdown soft break keeps a URL in the preceding paragraph. Split only
@@ -134,7 +135,11 @@ export async function renderMediaLinks(html, { fetcher, permittedUrl, assets, ca
     if (!candidate) continue;
     const { source, url, provider } = candidate;
     const fallback = `<figcaption><a href="${escape(source)}" rel="noopener noreferrer" data-blog-ui="videoSource">Open original video ↗</a></figcaption>`;
-    if (provider?.name === 'YouTube') {
+    if (gettyVideo(source)) {
+      if (!cache.has(source)) cache.set(source, gettyThumbnail(source, { fetcher }).catch(error => { warn('Getty thumbnail unavailable; using link card: ' + error.message); return null; }));
+      const thumbnail = await cache.get(source);
+      html = html.replace(paragraph, `<figure class="blog-figure blog-video"><div class="blog-embed blog-getty"><a class="blog-getty-link" href="${escape(source)}" target="_blank" rel="noopener noreferrer" aria-label="View video on Getty Images (opens in a new tab)">${thumbnail ? `<img src="${escape(thumbnail)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<span class="blog-youtube-play-icon" aria-hidden="true"></span><span class="blog-getty-note" aria-hidden="true">Getty Images</span></a></div><figcaption><a href="${escape(source)}" target="_blank" rel="noopener noreferrer" data-blog-ui="gettyView">View on Getty Images ↗</a></figcaption></figure>`);
+    } else if (provider?.name === 'YouTube') {
       html = html.replace(paragraph, `<figure class="blog-figure blog-video"><div class="blog-embed blog-youtube" data-youtube-id="${provider.id}"><button class="blog-youtube-play" type="button" aria-label="Play YouTube video"><img src="https://i.ytimg.com/vi/${provider.id}/hq720.jpg" alt="" width="1280" height="720" loading="lazy" referrerpolicy="no-referrer"><span class="blog-youtube-play-icon" aria-hidden="true"></span></button></div>${fallback}</figure>`);
     } else if (provider) {
       html = html.replace(paragraph, `<figure class="blog-figure blog-video"><div class="blog-embed"><iframe src="${escape(provider.src)}" title="${provider.name} video player" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="fullscreen; picture-in-picture; encrypted-media" allowfullscreen></iframe></div>${fallback}</figure>`);

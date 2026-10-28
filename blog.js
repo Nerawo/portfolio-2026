@@ -1,6 +1,6 @@
 (() => {
   const zh = document.documentElement.dataset.lang === 'zh';
-  const labels = { notes: '笔记与实验', title: '博客。', emptyTitle: '暂时还没有文章。', emptyText: '文章发布后会显示在这里。你也可以先浏览我的作品。', explore: '查看作品 ↗', read: '阅读全文 ↗', back: '← 返回博客列表', published: '发布于', updated: '更新于', original: '在 GitHub 查看原文 ↗', videoSource: '打开视频原链接 ↗' };
+  const labels = { notes: '笔记与实验', title: '博客。', emptyTitle: '暂时还没有文章。', emptyText: '文章发布后会显示在这里。你也可以先浏览我的作品。', explore: '查看作品 ↗', read: '阅读全文 ↗', back: '← 返回博客列表', published: '发布于', updated: '更新于', original: '在 GitHub 查看原文 ↗', videoSource: '打开视频原链接 ↗', gettyView: '前往 Getty Images 查看 ↗' };
   if (zh) document.querySelectorAll('[data-blog-ui]').forEach(node => { node.textContent = labels[node.dataset.blogUi] || node.textContent; });
   document.querySelectorAll('.blog-prose [data-blog-source]').forEach(node => {
     const name = node.dataset.blogSource;
@@ -43,6 +43,15 @@
       container.replaceChildren(player);
       player.focus({ preventScroll: true });
     }, { once: true });
+  });
+  document.querySelectorAll('.blog-prose .blog-getty-link').forEach(link => {
+    link.setAttribute('aria-label', zh ? '在新标签页前往 Getty Images 查看视频' : 'View video on Getty Images (opens in a new tab)');
+    const image = link.querySelector('img');
+    if (image) {
+      const fallback = () => { image.hidden = true; };
+      image.addEventListener('error', fallback);
+      if (image.complete && !image.naturalWidth) fallback();
+    }
   });
   document.querySelectorAll('[data-blog-date]').forEach(node => { node.textContent = new Intl.DateTimeFormat(zh ? 'zh-CN' : 'en', { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(node.dateTime)); });
   const toggle = document.querySelector('.theme-toggle');
