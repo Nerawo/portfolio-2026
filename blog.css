@@ -17,7 +17,7 @@
 .blog-article h1 { font-size: clamp(2.5rem, 5.5vw, 4rem); line-height: 1.1; overflow-wrap: anywhere; }
 .blog-updated { display: inline-block; margin-left: 16px; }
 .blog-prose > * { max-width: 760px; margin-inline: auto; }
-.blog-prose { font-size: 1.08rem; line-height: 1.85; overflow-wrap: anywhere; }
+.blog-prose { --blog-media-inset: max(0px, calc((100% - 760px) / 2)); font-size: 1.08rem; line-height: 1.85; overflow-wrap: anywhere; }
 .blog-prose p { margin-top: 0; margin-bottom: 1.1em; }
 .blog-prose h2 { font-size: 2.1rem; margin-top: 2em; margin-bottom: .65em; line-height: 1.2; scroll-margin-top: 88px; }
 .blog-prose h3 { font-size: 1.6rem; margin-top: 1.7em; margin-bottom: .6em; scroll-margin-top: 88px; }
@@ -31,9 +31,9 @@
 .blog-prose :not(pre) > code { padding: .1em .3em; background: var(--media-bg); border-radius: .2em; font-size: .9em; }
 .blog-prose table { display: block; overflow-x: auto; border-collapse: collapse; font-size: .95rem; }
 .blog-prose th, .blog-prose td { border: 1px solid var(--line); padding: .6em 1em; }
-.blog-prose .blog-figure { max-width: 1000px; margin: 24px auto; }
+/* Anchor media to the existing reading column; wider media uses its right gutter. */
+.blog-prose .blog-figure { width: calc(100% - var(--blog-media-inset)); max-width: 1000px; margin: 24px 0 24px var(--blog-media-inset); }
 .blog-figure .image-zoom { width: 100%; }
-.blog-prose .blog-figure:not(.blog-video) { width: 100%; max-width: var(--blog-image-width, 770px); }
 .blog-figure img { width: 100%; max-width: 100%; height: auto; object-fit: contain; border-radius: .4rem; }
 .blog-figure figcaption { margin-top: 8px; color: var(--muted); font-size: .85rem; line-height: 1.6; }
 .blog-article-bottom { max-width: 760px; margin: 40px auto 0; border-top: 1px solid var(--line); padding-top: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: .9rem; }
@@ -58,7 +58,7 @@
 @media (prefers-reduced-motion: reduce) { .blog-entry h2 a, .blog-entry .text-link { transition: none; } }
 
 /* Validated article media; listing and reading layout stay unchanged. */
-.blog-video video { display: block; width: auto; max-width: 100%; margin-inline: auto; height: auto; max-height: 80svh; object-fit: contain; background: var(--media-bg); border: 1px solid var(--line); border-radius: .4rem; }
+.blog-video video { display: block; width: 100%; max-width: 100%; margin-inline: 0; height: auto; object-fit: contain; background: var(--media-bg); border: 1px solid var(--line); border-radius: .4rem; }
 .blog-embed { position: relative; aspect-ratio: 16 / 9; background: var(--media-bg); border: 1px solid var(--line); border-radius: .4rem; overflow: hidden; }
 .blog-embed iframe { display: block; width: 100%; height: 100%; border: 0; }
 .blog-video figcaption { margin: 8px auto 0; text-align: right; }
@@ -75,8 +75,6 @@
 .blog-image-enlarge:hover, .blog-image-enlarge:focus-visible { color: var(--ink); }
 .blog-image-enlarge:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
-/* YouTube uses the same measured article media width, before and after play. */
-.blog-prose .blog-video:has(> .blog-youtube), .blog-prose .blog-video:has(> .blog-getty) { width: 100%; max-width: var(--blog-image-width, 770px); }
 .blog-youtube-play { display: block; position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: var(--media-bg); cursor: pointer; }
 .blog-youtube-play img { width: 100%; height: 100%; object-fit: contain; }
 .blog-youtube-play img[hidden] { display: none; }
