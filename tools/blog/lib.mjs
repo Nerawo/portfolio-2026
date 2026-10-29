@@ -159,9 +159,12 @@ export async function downloadImage(source, { fetcher = fetch } = {}) {
   throw new Error('Too many image redirects.');
 }
 
-// Hash-only upload alt metadata is not a human-readable automatic caption.
+// Opaque upload alt metadata is not a human-readable automatic caption.
 // Keep the original alt attribute and all article prose unchanged.
-export const imageCaption = alt => /^[a-f0-9]{32}$/i.test((alt || '').trim()) ? '' : alt || '';
+export const imageCaption = alt => {
+  const identifier = (alt || '').trim().replace(/^(?:attachment|upload)[-_:\s]+(?:id[-_:\s]+)?/i, '').replace(/\.(?:png|jpe?g|gif|webp|avif)$/i, '');
+  return /^(?:[a-f0-9]{16,128}|[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12})$/i.test(identifier) ? '' : alt || '';
+};
 
 export async function preparePosts(snapshot, config, { fetcher = fetch } = {}) {
   const selected = selectPosts(snapshot, config), assets = new Map(), cache = new Map(), videoCache = new Map();
