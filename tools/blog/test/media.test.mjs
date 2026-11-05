@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { testVideo } from './video-fixtures.mjs';
 import assert from 'node:assert/strict';
 import { providerVideo, inspectMp4 } from '../media.mjs';
 import { cleanMarkdown, preparePosts } from '../lib.mjs';
@@ -38,7 +39,7 @@ test('MP4 bytes, codec, dimensions and rotated phone tracks are inspected', () =
 test('public MP4 is localized once, reserves dimensions and has a permanent source fallback', async () => {
   let calls = 0;
   const result = await preparePosts(snapshot(`${attachment}\n\n${attachment}`), config, { fetcher: async (url, options) => {
-    calls++; assert.equal(String(url), attachment); assert.equal(options.credentials, 'omit'); assert.equal(options.redirect, 'manual'); assert(!options.headers.Authorization); return videoResponse(mp4());
+    calls++; assert.equal(String(url), attachment); assert.equal(options.credentials, 'omit'); assert.equal(options.redirect, 'manual'); assert(!options.headers.Authorization); return videoResponse(await testVideo());
   } });
   assert.equal(calls, 1); assert.equal(result.assets.size, 1);
   const html = result.posts[0].html;

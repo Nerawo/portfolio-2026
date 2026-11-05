@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { normalizeVideo } from './transcode.mjs';
 import sanitize from 'sanitize-html';
 import { gettyVideo, gettyThumbnail } from './getty.mjs';
 
@@ -49,7 +50,7 @@ function boxes(bytes, start = 0, end = bytes.length) {
   return result;
 }
 
-export function inspectMp4(bytes) {
+export function inspectMp4(bytes, { allowHevc = false } = {}) {
   const top = boxes(bytes), ftyp = top.find(b => b.type === 'ftyp'), moov = top.find(b => b.type === 'moov');
   if (!ftyp || ftyp.end - ftyp.start < 8 || !moov || !top.some(b => b.type === 'mdat')) throw new Error('Not a complete MP4.');
   const brands = [bytes.toString('ascii', ftyp.start, ftyp.start + 4)];
@@ -65,8 +66,8 @@ export function inspectMp4(bytes) {
     const stsd = stbl && children(stbl).find(b => b.type === 'stsd');
     if (!stsd || stsd.end - stsd.start < 8 || bytes.readUInt32BE(stsd.start + 4) !== 1) throw new Error('Unsupported video sample descriptions.');
     const samples = boxes(bytes, stsd.start + 8, stsd.end);
-    // H.264 is the conservative browser-compatible MP4 option. Other codecs retain a link.
-    if (samples.length !== 1 || !['avc1', 'avc3'].includes(samples[0].type)) throw new Error('Use an H.264 MP4 for web playback.');
+    // HEVC may enter the bounded build-only converter; the published output must be H.264.
+    if (samples.length !== 1 || !(allowHevc ? ['avc1', 'avc3', 'hvc1', 'hev1'] : ['avc1', 'avc3']).includes(samples[0].type)) throw new Error('Use an H.264 MP4, or a supported HEVC MP4 for automatic conversion.');
     const version = bytes[tkhd.start];
     if (![0, 1].includes(version) || tkhd.end - tkhd.start !== (version ? 96 : 84)) throw new Error('Invalid video dimensions.');
     let width = bytes.readUInt32BE(tkhd.end - 8) / 65536, height = bytes.readUInt32BE(tkhd.end - 4) / 65536;
@@ -95,7 +96,10 @@ async function downloadVideo(source, { fetcher, permittedUrl }) {
     }
     const chunks = []; let length = 0;
     for await (const chunk of response.body) { length += chunk.length; if (length > max) throw new Error('MP4 exceeds 100 MB.'); chunks.push(chunk); }
-    const buffer = Buffer.concat(chunks), dimensions = inspectMp4(buffer);
+    const input = Buffer.concat(chunks);
+    inspectMp4(input, { allowHevc: true });
+    const { buffer } = await normalizeVideo(input);
+    const dimensions = inspectMp4(buffer);
     return { buffer, ...dimensions, filename: `${crypto.createHash('sha256').update(buffer).digest('hex')}.mp4` };
   }
   throw new Error('Too many attachment redirects.');

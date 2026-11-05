@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { testVideo } from './video-fixtures.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {preparePosts,renderBlog}from'../lib.mjs';
@@ -10,10 +11,7 @@ const alt='980f0244e89687ddcc1d790d5d01cbf5';
 const category={id:'BLOG',name:'Blog',slug:'blog',isAnswerable:false};
 const snapshot=body=>({repository:config.repository,complete:true,category,discussions:[{number:1,title:'Discussion #1 regression',body,createdAt:'2026-10-27T10:13:52Z',updatedAt:'2026-10-27T12:31:27Z',url:'https://github.com/Nerawo/portfolio-2026/discussions/1',category,author:config.authors[0]}]});
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1kAAAAASUVORK5CYII=','base64');
-const box=(name,...parts)=>{const bytes=Buffer.concat(parts),head=Buffer.alloc(8);head.writeUInt32BE(bytes.length+8);head.write(name,4);return Buffer.concat([head,bytes]);};
-const track=Buffer.alloc(84);track.writeUInt32BE(768*65536,76);track.writeUInt32BE(432*65536,80);
-const handler=Buffer.alloc(12);handler.write('vide',8);const count=Buffer.alloc(8);count.writeUInt32BE(1,4);
-const mp4=Buffer.concat([box('ftyp',Buffer.from('isom\0\0\0\0isomavc1')),box('moov',box('trak',box('tkhd',track),box('mdia',box('hdlr',handler),box('minf',box('stbl',box('stsd',count,box('avc1'))))))),box('mdat')]);
+const mp4=await testVideo({width:768,height:432});
 const fetcher=async(url,options)=>{assert.equal(options.credentials,'omit');assert(!options.headers.Authorization);if(String(url)===videoUrl)return new Response(mp4,{headers:{'content-type':'video/mp4'}});if(String(url)===imageUrl)return new Response(png,{headers:{'content-type':'image/png'}});throw Error('Unexpected URL '+url);};
 
 test('actual Discussion #1 soft-break Markdown produces the validated video and preserves surrounding prose',async()=>{
