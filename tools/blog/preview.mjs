@@ -42,7 +42,7 @@ export async function publishedPreview({fetcher=fetch}={}) {
     const dates=[...(header||'').matchAll(/<time datetime="([^"]+)"/g)].map(m=>m[1]);
     const title=header?.match(/<h1>([\s\S]*?)<\/h1>/)?.[1];
     const url=`https://github.com/${config.repository}/discussions/${number}`;
-    if(!Number.isSafeInteger(number)||!title||html===undefined||!dates.length||dates.some(d=>!Number.isFinite(Date.parse(d)))||!page.includes(`href="${url}"`))throw new Error(`Published article ${number} is incomplete.`);
+    if(!Number.isSafeInteger(number)||!title||html===undefined||!dates.length||dates.some(d=>!Number.isFinite(Date.parse(d)))||!(page.includes(`data-discussion-url="${url}"`) || page.includes(`href="${url}"`)))throw new Error(`Published article ${number} is incomplete.`);
     // Rebuild generated players from their canonical fallback URLs, never trust
     // an iframe/video copied from remote HTML.
     html=html.replace(/<figure class="blog-figure blog-video">[\s\S]*?<\/figure>/g,figure=>{
