@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { parseProject, normalizeProject, projectKey, groupProjects } from './projects.mjs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { Marked } from 'marked';
@@ -21,7 +22,7 @@ export function safeLink(value, base) {
   } catch { return ''; }
 }
 
-export function parseEditorial(body) {
+export function parseEditorial(body, { warn = console.warn } = {}) {
   // Both directives are optional. Normal titles and Markdown remain the source.
   const match = body.match(/^\s*<!--\s*blog\s*\n([\s\S]*?)\n-->\s*/i);
   let summary = '', cover = '';
@@ -33,7 +34,8 @@ export function parseEditorial(body) {
       else cover = field[2];
     }
   }
-  return { markdown: match ? body.slice(match[0].length) : body, summary, cover };
+  const parsed = parseProject(match ? body.slice(match[0].length) : body, { warn });
+  return { ...parsed, summary, cover };
 }
 
 function markdownParser() {
@@ -174,7 +176,7 @@ export async function preparePosts(snapshot, config, { fetcher = fetch } = {}) {
   }
   const posts = [];
   for (const post of selected) {
-    const editorial = parseEditorial(post.body);
+    const editorial = parseEditorial(post.body, { warn: message => console.warn(`Discussion #${post.number}: ${message}`) });
     let html = cleanMarkdown(editorial.markdown, post.url);
     const imageTags = [...html.matchAll(/<img\b[^>]*>/g)];
     for (const [tag] of imageTags) {
@@ -194,7 +196,7 @@ export async function preparePosts(snapshot, config, { fetcher = fetch } = {}) {
     html = await renderMediaLinks(html, { fetcher, permittedUrl: permittedImage, assets, cache: videoCache });
     const summary = editorial.summary || plain(cleanMarkdown(editorial.markdown, post.url).replace(/<pre>[\s\S]*?<\/pre>/g, '')).slice(0, 180);
     const cover = editorial.cover ? await image(editorial.cover) : null;
-    posts.push({ ...post, html, summary, cover });
+    posts.push({ ...post, html, summary, cover, project: editorial.project });
   }
   return { posts, assets };
 }
@@ -224,7 +226,7 @@ const time = iso => `<time datetime="${escape(iso)}" data-blog-date>${date(iso)}
 
 // Listing excerpts are derived separately: article HTML and metadata stay intact.
 function listingExcerpt(post) {
-  const editorial = typeof post.body === 'string' ? parseEditorial(post.body) : null;
+  const editorial = typeof post.body === 'string' ? parseEditorial(post.body, { warn: () => {} }) : null;
   const source = editorial ? editorial.summary || editorial.markdown : post.summary || '';
   const mediaLink = href => {
     try {
@@ -279,15 +281,19 @@ const calendarDate = iso => new Date(iso).toISOString().slice(0, 10);
 
 export function renderBlog(prepared, config, indexHtml) {
   const pages = new Map();
-  const cards = prepared.posts.map(post => { const excerpt = listingExcerpt(post); return `<article class="blog-entry${post.cover ? ' has-cover' : ''}"><div class="blog-entry-copy"><p class="blog-date">${time(post.createdAt)}</p><h2><a href="blog/${post.path}">${escape(post.title)}</a></h2>${excerpt ? `<p class="blog-entry-excerpt">${escape(excerpt)}</p>` : ''}<a class="text-link" href="blog/${post.path}" data-blog-ui="read">Read article ↗</a></div>${post.cover ? `<a class="blog-cover" href="blog/${post.path}" tabindex="-1" aria-hidden="true"><img src="blog/media/${post.cover.filename}" alt="" width="${post.cover.width}" height="${post.cover.height}" loading="lazy"></a>` : ''}</article>`; }).join('\n');
+  const projectFor = post => normalizeProject(post.project) || (typeof post.body === 'string' ? parseEditorial(post.body, { warn: () => {} }).project : 'Uncategorized');
+  const groups = groupProjects(prepared.posts, projectFor);
+  const folders = groups.map(group => '<a class="blog-project-folder" href="blog.html?project=' + encodeURIComponent(group.key) + '" data-blog-project="' + escape(group.key) + '" data-project-name="' + escape(group.name) + '"><svg viewBox="0 0 40 32" aria-hidden="true"><path d="M2 9V4h13l4 5h19v20H2Z"/><path d="M2 9h36"/></svg><span class="blog-project-name"' + (group.key === 'uncategorized' ? ' data-blog-ui="uncategorized"' : '') + '>' + escape(group.name) + '</span><span class="blog-project-count" data-project-count="' + group.count + '">' + group.count + ' ' + (group.count === 1 ? 'article' : 'articles') + '</span><span class="blog-project-arrow" aria-hidden="true">↗</span></a>').join('');
+  const projects = '<section class="blog-projects" aria-labelledby="blog-projects-heading"><h2 id="blog-projects-heading" class="blog-section-heading" data-blog-ui="projects">Projects</h2>' + (groups.length ? '<div class="blog-project-grid">' + folders + '</div>' : '<p class="blog-project-empty" data-blog-ui="emptyProjects">Project folders appear when articles are published.</p>') + '</section>';
+  const cards = prepared.posts.map(post => { const excerpt = listingExcerpt(post); return `<article class="blog-entry${post.cover ? ' has-cover' : ''}" data-article-project="${escape(projectKey(projectFor(post)))}"><div class="blog-entry-copy"><p class="blog-date">${time(post.createdAt)}</p><h2><a href="blog/${post.path}">${escape(post.title)}</a></h2>${excerpt ? `<p class="blog-entry-excerpt">${escape(excerpt)}</p>` : ''}<a class="text-link" href="blog/${post.path}" data-blog-ui="read">Read article ↗</a></div>${post.cover ? `<a class="blog-cover" href="blog/${post.path}" tabindex="-1" aria-hidden="true"><img src="blog/media/${post.cover.filename}" alt="" width="${post.cover.width}" height="${post.cover.height}" loading="lazy"></a>` : ''}</article>`; }).join('\n');
   const empty = `<section class="blog-empty"><h2 data-blog-ui="emptyTitle">No posts yet.</h2><p data-blog-ui="emptyText">Articles will appear here when they are published. In the meantime, explore my work.</p><a class="text-link" href="work.html" data-blog-ui="explore">Explore Work ↗</a></section>`;
-  pages.set('blog.html', shell({ title: 'Blog', description: 'Notes on technical art, tools and creative practice by Lu Zhang.', indexHtml, prefix: '', canonical: new URL('blog.html', config.siteUrl).href, content: `<header class="blog-heading"><p class="eyebrow" data-blog-ui="notes">Notes &amp; experiments</p><h1 data-blog-ui="title">Blog.</h1></header><div class="blog-list">${cards || empty}</div>` }));
+  pages.set('blog.html', shell({ title: 'Blog', description: 'Notes on technical art, tools and creative practice by Lu Zhang.', indexHtml, prefix: '', canonical: new URL('blog.html', config.siteUrl).href, content: `<header class="blog-heading"><p class="eyebrow" data-blog-ui="notes">Notes &amp; experiments</p><h1 data-blog-ui="title">Blog.</h1></header>${projects}<section class="blog-recent" aria-labelledby="blog-recent-heading"><div class="blog-recent-header"><h2 id="blog-recent-heading" class="blog-section-heading" tabindex="-1" data-blog-ui="recent">Recent Articles</h2><a class="blog-project-clear" href="blog.html" data-blog-ui="allArticles" hidden>← All articles</a></div><p class="blog-project-results" role="status" hidden></p><div class="blog-list" data-blog-project-list>${cards || empty}</div><p class="blog-project-no-results" data-blog-ui="noProjectArticles" hidden>No articles in this project.</p></section>` }));
   // Oldest first, independently of archive order. Equal timestamps use title,
   // then a content hash; never Discussion IDs, numbers, or modification times.
   const chronological = [...prepared.posts].sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt) || (a.title < b.title ? -1 : a.title > b.title ? 1 : 0) || digest(a.body ?? a.html ?? '').localeCompare(digest(b.body ?? b.html ?? ''), 'en'));
   for (const [index, post] of chronological.entries()) {
     const previous = chronological[index - 1], next = chronological[index + 1];
-    const content = `<article class="blog-article" data-discussion-url="${escape(post.url)}"><header class="blog-article-header"><a class="blog-back" href="../blog.html" data-blog-ui="back">← All articles</a><p class="blog-date"><span data-blog-ui="published">Published</span> ${time(post.createdAt)}${calendarDate(post.updatedAt) !== calendarDate(post.createdAt) ? ` <span class="blog-updated"><span data-blog-ui="updated">Updated</span> ${time(post.updatedAt)}</span>` : ''}</p><h1>${escape(post.title)}</h1></header><div class="blog-prose">${articleSourceLinks(post.html)}</div><div class="blog-article-bottom"><nav class="blog-article-navigation" aria-label="Article navigation">${previous ? `<a href="${escape(previous.path)}" rel="prev" data-blog-ui="previous">← Previous Article</a>` : ''}${next ? `<a href="${escape(next.path)}" rel="next" data-blog-ui="next">Next Article →</a>` : ''}</nav><a class="blog-all-articles" href="../blog.html" data-blog-ui="back">← All articles</a></div></article>`;
+    const content = `<article class="blog-article" data-discussion-url="${escape(post.url)}" data-blog-project-name="${escape(projectFor(post))}"><header class="blog-article-header"><a class="blog-back" href="../blog.html" data-blog-ui="back">← All articles</a><p class="blog-date"><span data-blog-ui="published">Published</span> ${time(post.createdAt)}${calendarDate(post.updatedAt) !== calendarDate(post.createdAt) ? ` <span class="blog-updated"><span data-blog-ui="updated">Updated</span> ${time(post.updatedAt)}</span>` : ''}</p><h1>${escape(post.title)}</h1></header><div class="blog-prose">${articleSourceLinks(post.html)}</div><div class="blog-article-bottom"><nav class="blog-article-navigation" aria-label="Article navigation">${previous ? `<a href="${escape(previous.path)}" rel="prev" data-blog-ui="previous">← Previous Article</a>` : ''}${next ? `<a href="${escape(next.path)}" rel="next" data-blog-ui="next">Next Article →</a>` : ''}</nav><a class="blog-all-articles" href="../blog.html" data-blog-ui="back">← All articles</a></div></article>`;
     pages.set(`blog/${post.path}`, shell({ title: post.title, description: post.summary, content, indexHtml, prefix: '../', canonical: new URL(`blog/${post.path}`, config.siteUrl).href }));
   }
   return pages;

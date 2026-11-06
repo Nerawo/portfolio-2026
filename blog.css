@@ -96,3 +96,24 @@
 .blog-getty:has(img:not([hidden])) .blog-getty-note { display: none; }
 .blog-getty-link:focus-visible { outline: 2px solid var(--ink); outline-offset: -4px; }
 .blog-getty-link:hover .blog-youtube-play-icon { background: rgba(10,18,13,.96); }
+
+/* Project archive controls are scoped to the Blog landing page. */
+.blog-projects { margin-bottom: 52px; }
+.blog-section-heading { font: inherit; font-size: .8rem; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 0 0 22px; }
+.blog-project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+.blog-project-folder { display: grid; grid-template-columns: minmax(0, 1fr) 20px; gap: 10px 16px; align-items: center; padding: 26px 22px; border: 1px solid var(--line); border-radius: 3px; background: transparent; transition: border-color .16s ease, background-color .16s ease; }
+.blog-project-folder svg { width: 38px; height: 32px; grid-column: 1; grid-row: 1; margin-bottom: 10px; stroke: var(--muted); fill: none; stroke-width: 1.2; }
+.blog-project-name { grid-column: 1 / -1; grid-row: 2; font-family: inherit; font-size: 1.5rem; line-height: 1.2; overflow-wrap: anywhere; }
+.blog-project-count { grid-column: 1; grid-row: 3; color: var(--muted); font-size: .8rem; }
+.blog-project-arrow { grid-column: 2; grid-row: 3; color: var(--muted); }
+.blog-project-folder:hover, .blog-project-folder[aria-current] { border-color: var(--ink); background: var(--media-bg); }
+.blog-project-folder:focus-visible, .blog-project-clear:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.blog-recent-header { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; }
+.blog-project-clear { font-size: .85rem; margin-bottom: 22px; }
+.blog-project-results, .blog-project-empty, .blog-project-no-results { color: var(--muted); font-size: .9rem; margin-bottom: 24px; }
+.blog-project-results { margin-top: -8px; }
+.blog-project-no-results { border-top: 1px solid var(--line); padding-block: 28px; }
+.blog-recent [hidden] { display: none !important; }
+#blog-recent-heading { scroll-margin-top: 100px; }
+@media (max-width: 720px) { .blog-projects { margin-bottom: 38px; } .blog-project-folder { padding: 22px 18px; } .blog-project-name { font-size: 1.35rem; } .blog-recent-header { flex-wrap: wrap; gap: 0 16px; } }
+@media (prefers-reduced-motion: reduce) { .blog-project-folder { transition: none; } }

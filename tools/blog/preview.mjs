@@ -76,10 +76,11 @@ export async function publishedPreview({fetcher=fetch}={}) {
     // The normal attachment validator (including every redirect) remains in use.
     html=await renderMediaLinks(html,{fetcher,permittedUrl:permittedImage,assets,cache});
     let cover=null;
-    const entry=[...listing.matchAll(/<article class="blog-entry[^\"]*">([\s\S]*?)<\/article>/g)].find(m=>m[1].includes(`href="${file}"`))?.[1];
+    const entry=[...listing.matchAll(/<article class="blog-entry[^\"]*"[^>]*>([\s\S]*?)<\/article>/g)].find(m=>m[1].includes(`href="${file}"`))?.[1];
     const coverSrc=entry?.match(/<img\b[^>]*src="([^"]+)"/)?.[1];
     if(coverSrc)cover=await image(new URL(decode(coverSrc),site).href);
-    posts.push({number,path:`${number}.html`,title:text(title),createdAt:dates[0],updatedAt:dates[1]||dates[0],url,html,body,summary:decode(page.match(/<meta name="description" content="([^"]*)"/)?.[1]||''),cover});
+    const project=decode(page.match(/<article class="blog-article"[^>]*data-blog-project-name="([^"]*)"/)?.[1]||'Uncategorized');
+    posts.push({project,number,path:`${number}.html`,title:text(title),createdAt:dates[0],updatedAt:dates[1]||dates[0],url,html,body,summary:decode(page.match(/<meta name="description" content="([^"]*)"/)?.[1]||''),cover});
   }
   return{posts,assets};
 }

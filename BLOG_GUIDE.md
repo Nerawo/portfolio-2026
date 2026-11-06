@@ -131,3 +131,17 @@ node tools/preview.cjs
 
 - [YouTube 隐私增强模式与嵌入限制](https://support.google.com/youtube/answer/171780?hl=en)
 - [Vimeo 播放器参数与 DNT](https://help.vimeo.com/hc/en-us/articles/12426260232977-About-Player-Parameters)
+
+## 按项目归档
+
+在 Discussion 开头（可在标题下、现有 blog 注释之后）写独立一行，后面留一空行：
+
+```text
+Project: Tear Gas Canister
+
+从这里写正文。
+```
+
+项目文件夹自动生成，无需改代码或另建 GitHub 分类。每篇文章只归一个项目；未填写则进入 Uncategorized / 未分类。前后空白、连续空格和大小写统一比较，显示名称保留文章填写的形式。多个字段使用第一个有效值并写构建警告。项目名称限 1–80 字符，禁止 HTML；无效字段保留为正文并写警告。只检查正文开头的元数据区（最多前 20 行，可包含 Markdown 标题），不扫描代码块、引用或后续段落。Project 行后需空一行，避免把连续的普通正文误当元数据。
+
+项目名字段不显示在文章正文或摘要中；GitHub 原帖保持原样。文件夹使用 blog.html?project=项目名称 的查询参数，可直接分享、刷新、前进/后退。改项目名会更改文件夹查询地址，但文章编号地址始终不变。关闭 JavaScript 时仍可阅读完整文章列表。

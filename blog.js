@@ -1,12 +1,47 @@
 (() => {
   const zh = document.documentElement.dataset.lang === 'zh';
-  const labels = { notes: '笔记与实验', title: '博客。', emptyTitle: '暂时还没有文章。', emptyText: '文章发布后会显示在这里。你也可以先浏览我的作品。', explore: '查看作品 ↗', read: '阅读全文 ↗', back: '← 返回博客列表', published: '发布于', updated: '更新于', previous: '← 上一篇文章', next: '下一篇文章 →', videoSource: '打开视频原链接 ↗', gettyView: '前往 Getty Images 查看 ↗' };
+  const labels = { projects: '项目归档', recent: '最近文章', allArticles: '← 全部文章', uncategorized: '未分类', emptyProjects: '发布文章后会自动生成项目文件夹。', noProjectArticles: '该项目下暂无文章。', notes: '笔记与实验', title: '博客。', emptyTitle: '暂时还没有文章。', emptyText: '文章发布后会显示在这里。你也可以先浏览我的作品。', explore: '查看作品 ↗', read: '阅读全文 ↗', back: '← 返回博客列表', published: '发布于', updated: '更新于', previous: '← 上一篇文章', next: '下一篇文章 →', videoSource: '打开视频原链接 ↗', gettyView: '前往 Getty Images 查看 ↗' };
   if (zh) document.querySelectorAll('[data-blog-ui]').forEach(node => { node.textContent = labels[node.dataset.blogUi] || node.textContent; });
   document.querySelectorAll('.blog-prose [data-blog-source]').forEach(node => {
     const name = node.dataset.blogSource;
     node.textContent = zh ? name ? '来源：' + name + ' ↗' : '查看来源 ↗' : name ? 'Source: ' + name + ' ↗' : 'View source ↗';
   });
   document.querySelector('.blog-article-navigation')?.setAttribute('aria-label', zh ? '文章导航' : 'Article navigation');
+  // Progressive enhancement: the complete chronological list remains in HTML.
+  const projectList = document.querySelector('[data-blog-project-list]');
+  if (projectList) {
+    const entries = [...projectList.querySelectorAll('[data-article-project]')];
+    const folders = [...document.querySelectorAll('[data-blog-project]')];
+    const heading = document.querySelector('#blog-recent-heading');
+    const clear = document.querySelector('.blog-project-clear');
+    const status = document.querySelector('.blog-project-results');
+    const empty = document.querySelector('.blog-project-no-results');
+    const key = text => String(text).normalize('NFKC').replace(/\s+/gu, ' ').trim().toLowerCase();
+    const name = folder => folder.dataset.blogProject === 'uncategorized' && zh ? '未分类' : folder.dataset.projectName;
+    document.querySelectorAll('[data-project-count]').forEach(node => {
+      const count = Number(node.dataset.projectCount);
+      node.textContent = zh ? count + ' 篇文章' : count + (count === 1 ? ' article' : ' articles');
+    });
+    const update = () => {
+      const requested = new URL(location.href).searchParams.get('project');
+      const selected = requested === null ? null : folders.find(folder => folder.dataset.blogProject === key(requested));
+      let visible = 0;
+      entries.forEach(entry => { entry.hidden = requested !== null && (!selected || entry.dataset.articleProject !== selected.dataset.blogProject); if (!entry.hidden) visible++; });
+      folders.forEach(folder => { if (folder === selected) folder.setAttribute('aria-current', 'true'); else folder.removeAttribute('aria-current'); });
+      heading.textContent = requested === null ? zh ? '最近文章' : 'Recent Articles' : selected ? name(selected) : zh ? '未找到项目' : 'Project not found';
+      clear.hidden = requested === null;
+      status.hidden = requested === null;
+      status.textContent = zh ? visible + ' 篇文章' : visible + (visible === 1 ? ' article' : ' articles');
+      empty.hidden = requested === null || visible > 0;
+    };
+    for (const link of [...folders, clear]) link.addEventListener('click', event => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault(); history.pushState(null, '', link.href); update(); heading.focus();
+    });
+    addEventListener('popstate', update);
+    update();
+  }
+
   // Align the fallback with the rendered player, including narrower portrait media.
   document.querySelectorAll('.blog-video > video').forEach(video => {
     const caption = video.parentElement.querySelector('figcaption');
