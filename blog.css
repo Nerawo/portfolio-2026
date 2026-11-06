@@ -125,3 +125,12 @@
 .blog-heading[data-project-view] h1 { font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.1; overflow-wrap: anywhere; }
 .blog-heading[data-project-view] { margin-bottom: 30px; }
 .blog-heading[data-project-view] + .blog-projects + .blog-recent .blog-project-clear { margin-bottom: 20px; }
+
+/* Quiet project credits in the homepage article metadata only. */
+.blog-entry-copy > .blog-date { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2em .6em; }
+.blog-entry-copy > .blog-date time { white-space: nowrap; }
+.blog-entry-project { display: inline-flex; align-items: baseline; gap: .6em; min-width: 0; max-width: 100%; }
+.blog-entry-project a { display: inline-flex; align-items: baseline; gap: .4em; min-width: 0; max-width: 100%; color: inherit; }
+.blog-entry-project svg { flex: 0 0 14px; align-self: center; width: 14px; height: 12px; fill: none; }
+.blog-entry-project a span { min-width: 0; overflow-wrap: anywhere; }
+.blog-entry-project a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: .2em; }

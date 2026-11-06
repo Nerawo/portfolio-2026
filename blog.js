@@ -11,6 +11,7 @@
   const projectList = document.querySelector('[data-blog-project-list]');
   if (projectList) {
     const entries = [...projectList.querySelectorAll('[data-article-project]')];
+    const projectLinks = [...projectList.querySelectorAll('[data-blog-project-link]')];
     const folders = [...document.querySelectorAll('[data-blog-project]')];
     const heading = document.querySelector('#blog-recent-heading');
     const intro = document.querySelector('.blog-heading');
@@ -37,6 +38,7 @@
       folders.forEach(folder => { if (folder === selected) folder.setAttribute('aria-current', 'true'); else folder.removeAttribute('aria-current'); });
       heading.textContent = requested === null ? zh ? '最近文章' : 'Recent Articles' : selected ? name(selected) : zh ? '未找到项目' : 'Project not found';
       const projectView = requested !== null;
+      projectLinks.forEach(link => { link.closest('.blog-entry-project').hidden = projectView; });
       intro.toggleAttribute('data-project-view', projectView);
       projectSection.hidden = projectView;
       heading.hidden = projectView;
@@ -48,7 +50,7 @@
       status.textContent = zh ? visible + ' 篇文章' : visible + (visible === 1 ? ' article' : ' articles');
       empty.hidden = requested === null || visible > 0;
     };
-    for (const link of [...folders, clear, ...homeLinks]) link.addEventListener('click', event => {
+    for (const link of [...folders, ...projectLinks, clear, ...homeLinks]) link.addEventListener('click', event => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault(); history.pushState(null, '', link.href); update(); title.focus();
     });
