@@ -1,11 +1,12 @@
 (() => {
   const zh = document.documentElement.dataset.lang === 'zh';
-  const labels = { notes: '笔记与实验', title: '博客。', emptyTitle: '暂时还没有文章。', emptyText: '文章发布后会显示在这里。你也可以先浏览我的作品。', explore: '查看作品 ↗', read: '阅读全文 ↗', back: '← 返回博客列表', published: '发布于', updated: '更新于', next: '下一篇文章 →', videoSource: '打开视频原链接 ↗', gettyView: '前往 Getty Images 查看 ↗' };
+  const labels = { notes: '笔记与实验', title: '博客。', emptyTitle: '暂时还没有文章。', emptyText: '文章发布后会显示在这里。你也可以先浏览我的作品。', explore: '查看作品 ↗', read: '阅读全文 ↗', back: '← 返回博客列表', published: '发布于', updated: '更新于', previous: '← 上一篇文章', next: '下一篇文章 →', videoSource: '打开视频原链接 ↗', gettyView: '前往 Getty Images 查看 ↗' };
   if (zh) document.querySelectorAll('[data-blog-ui]').forEach(node => { node.textContent = labels[node.dataset.blogUi] || node.textContent; });
   document.querySelectorAll('.blog-prose [data-blog-source]').forEach(node => {
     const name = node.dataset.blogSource;
     node.textContent = zh ? name ? '来源：' + name + ' ↗' : '查看来源 ↗' : name ? 'Source: ' + name + ' ↗' : 'View source ↗';
   });
+  document.querySelector('.blog-article-navigation')?.setAttribute('aria-label', zh ? '文章导航' : 'Article navigation');
   // Align the fallback with the rendered player, including narrower portrait media.
   document.querySelectorAll('.blog-video > video').forEach(video => {
     const caption = video.parentElement.querySelector('figcaption');

@@ -9,34 +9,24 @@ const header = '<header class="site-header"><a href="index.html">Lu Zhang</a></h
 const post = (number, day) => ({ number, title: `Article ${number}`, body: 'Original prose.', createdAt: `2026-10-${day}T12:00:00Z`, updatedAt: `2026-11-05T12:00:00Z`, author: config.authors[0], category, url: `https://github.com/${config.repository}/discussions/${number}` });
 const prepare = discussions => preparePosts({ repository: config.repository, complete: true, category, discussions }, config);
 
-test('Next follows newest-to-oldest listing order, not IDs, modification times or title changes', async () => {
-  const prepared = await prepare([post(18, '01'), post(2, '03'), post(47, '02')]);
-  assert.deepEqual(prepared.posts.map(p => p.number), [2, 47, 18]);
-  const before = JSON.stringify(prepared.posts), pages = renderBlog(prepared, config, header);
-  assert.equal(JSON.stringify(prepared.posts), before);
-  const listed = [...pages.get('blog.html').matchAll(/<h2><a href="blog\/([^" ]+)"/g)].map(m => m[1]);
-  assert.deepEqual(listed, ['2.html', '47.html', '18.html']);
-  for (let i = 0; i < listed.length; i++) {
-    const html = pages.get('blog/' + listed[i]), footer = html.match(/<div class="blog-article-bottom">([\s\S]*?)<\/div>/)[1];
-    assert(footer.startsWith('<a href="../blog.html" data-blog-ui="back">← All articles</a>'));
-    assert(!footer.includes('github.com')); assert(!html.includes('Read on GitHub'));
-    assert(html.includes(`data-discussion-url="${prepared.posts[i].url}"`));
-    assert(html.includes(`rel="canonical" href="${config.siteUrl}blog/${listed[i]}"`));
-    if (listed[i + 1]) assert(footer.includes(`href="${listed[i + 1]}" rel="next" data-blog-ui="next">Next Article →</a>`));
-    else assert.equal((footer.match(/<a /g) || []).length, 1);
-  }
-  prepared.posts[0].title = 'Renamed title';
-  assert(renderBlog(prepared, config, header).get('blog/2.html').includes('href="47.html" rel="next"'));
+test('Previous is older and Next is newer, regardless of input/ID order; archive stays newest first', async () => {
+ const prepared=await prepare([post(18,'01'),post(2,'03'),post(47,'02')]);
+ const before=JSON.stringify(prepared),pages=renderBlog(prepared,config,header);
+ assert.equal(JSON.stringify(prepared),before);
+ assert.deepEqual([...pages.get('blog.html').matchAll(/<h2><a href="blog\/([^" ]+)"/g)].map(m=>m[1]),['2.html','47.html','18.html']);
+ for(const [number,previous,next] of [[18,null,47],[47,18,2],[2,47,null]]){
+  const html=pages.get('blog/'+number+'.html'),footer=html.split('<div class="blog-article-bottom">')[1];
+  for(const [rel,destination] of [['prev',previous],['next',next]])if(destination)assert(footer.includes('href="'+destination+'.html" rel="'+rel+'"'));else assert(!footer.includes('rel="'+rel+'"'));
+  assert(footer.includes('class="blog-all-articles" href="../blog.html"'));assert(html.includes('class="blog-back" href="../blog.html"'));assert(!footer.includes('Read on GitHub'));
+  assert(html.includes('data-discussion-url="https://github.com/'+config.repository+'/discussions/'+number+'"'));
+ }
 });
-
-test('ties, deletion and category removal update the navigation without broken or placeholder links', async () => {
-  const first = post(12, '03'), second = post(6, '03'), oldest = post(39, '01');
-  const prepared = await prepare([oldest, second, first]);
-  assert.deepEqual(prepared.posts.map(p => p.number), [12, 6, 39]);
-  const pages = renderBlog(await prepare([oldest, first, { ...second, category: { id: 'OTHER', slug: 'other' } }]), config, header);
-  assert(pages.get('blog/12.html').includes('href="39.html" rel="next"')); assert(!pages.has('blog/6.html'));
-  const single = renderBlog(await prepare([oldest]), config, header).get('blog/39.html');
-  assert(!single.includes('rel="next"')); assert(!single.includes('Next Article')); assert(!single.includes('Read on GitHub'));
+test('equal publication timestamps use title then content, not IDs or input order; removal skips unpublished posts', async () => {
+ const a={...post(99,'03'),title:'Alpha'},b={...post(1,'03'),title:'Beta'};
+ for(const input of [[a,b],[b,a]]){const pages=renderBlog(await prepare(input),config,header);assert(pages.get('blog/99.html').includes('href="1.html" rel="next"'));assert(pages.get('blog/1.html').includes('href="99.html" rel="prev"'));}
+ const x={...a,title:'Same',body:'First text'},y={...b,title:'Same',body:'Other text'};
+ const forward=renderBlog(await prepare([x,y]),config,header),reverse=renderBlog(await prepare([y,x]),config,header);assert.equal(forward.get('blog/99.html'),reverse.get('blog/99.html'));
+ const pages=renderBlog(await prepare([a,{...b,category:{id:'OTHER',slug:'other'}}]),config,header);assert(!pages.has('blog/1.html'));assert(!pages.get('blog/99.html').includes('rel="next"'));assert(!pages.get('blog/99.html').includes('rel="prev"'));
 });
 
 test('published local preview accepts the new nonvisible Discussion metadata and rejects missing or wrong sources', async () => {
