@@ -38,3 +38,13 @@ test('explicit summaries are cleaned for listing only; metadata and detail outpu
  assert(result.get('blog.html').includes('<p class="blog-entry-excerpt">A clear summary.</p>'));
  assert(result.get('blog/8.html').includes('content="Existing detail description"'));assert.equal(item.summary,'Existing detail description');
 });
+
+test('landing HTML supplies a single progressive project header without changing article content',()=>{
+ const html=renderBlog({posts:[post(1)],assets:new Map()},config,header).get('blog.html');
+ assert(html.includes('class="blog-project-breadcrumb" hidden'));assert(html.includes('data-blog-home>Blog</a>'));
+ assert(html.includes('<h1 data-blog-ui="title" tabindex="-1">Blog.</h1>'));
+ assert.equal((html.match(/class="blog-project-results"/g)||[]).length,1);
+ assert(html.indexOf('class="blog-project-results"')<html.indexOf('<section class="blog-projects"'));
+ assert(html.includes('data-blog-ui="recent">Recent Articles</h2>'));
+ const detail=renderBlog({posts:[post(1)],assets:new Map()},config,header).get('blog/1.html');assert(!detail.includes('blog-project-breadcrumb'));assert(detail.includes('<p>Unchanged article body.</p>'));
+});

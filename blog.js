@@ -13,9 +13,16 @@
     const entries = [...projectList.querySelectorAll('[data-article-project]')];
     const folders = [...document.querySelectorAll('[data-blog-project]')];
     const heading = document.querySelector('#blog-recent-heading');
+    const intro = document.querySelector('.blog-heading');
+    const title = intro.querySelector('h1');
+    const eyebrow = intro.querySelector('.eyebrow');
+    const breadcrumb = intro.querySelector('.blog-project-breadcrumb');
+    const projectSection = document.querySelector('.blog-projects');
+    const homeLinks = [...document.querySelectorAll('[data-blog-home]')];
     const clear = document.querySelector('.blog-project-clear');
     const status = document.querySelector('.blog-project-results');
     const empty = document.querySelector('.blog-project-no-results');
+    homeLinks.forEach(link => { link.textContent = zh ? '博客' : 'Blog'; });
     const key = text => String(text).normalize('NFKC').replace(/\s+/gu, ' ').trim().toLowerCase();
     const name = folder => folder.dataset.blogProject === 'uncategorized' && zh ? '未分类' : folder.dataset.projectName;
     document.querySelectorAll('[data-project-count]').forEach(node => {
@@ -29,14 +36,21 @@
       entries.forEach(entry => { entry.hidden = requested !== null && (!selected || entry.dataset.articleProject !== selected.dataset.blogProject); if (!entry.hidden) visible++; });
       folders.forEach(folder => { if (folder === selected) folder.setAttribute('aria-current', 'true'); else folder.removeAttribute('aria-current'); });
       heading.textContent = requested === null ? zh ? '最近文章' : 'Recent Articles' : selected ? name(selected) : zh ? '未找到项目' : 'Project not found';
-      clear.hidden = requested === null;
+      const projectView = requested !== null;
+      intro.toggleAttribute('data-project-view', projectView);
+      projectSection.hidden = projectView;
+      heading.hidden = projectView;
+      eyebrow.hidden = projectView;
+      breadcrumb.hidden = !projectView;
+      title.textContent = projectView ? heading.textContent : zh ? labels.title : 'Blog.';
+      clear.hidden = !projectView;
       status.hidden = requested === null;
       status.textContent = zh ? visible + ' 篇文章' : visible + (visible === 1 ? ' article' : ' articles');
       empty.hidden = requested === null || visible > 0;
     };
-    for (const link of [...folders, clear]) link.addEventListener('click', event => {
+    for (const link of [...folders, clear, ...homeLinks]) link.addEventListener('click', event => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      event.preventDefault(); history.pushState(null, '', link.href); update(); heading.focus();
+      event.preventDefault(); history.pushState(null, '', link.href); update(); title.focus();
     });
     addEventListener('popstate', update);
     update();
