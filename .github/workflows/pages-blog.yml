@@ -35,15 +35,8 @@ jobs:
           cache-dependency-path: tools/blog/package-lock.json
       - name: Install build-only dependencies
         run: npm ci --prefix tools/blog
-      - name: Install and verify build-only video tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -y ffmpeg
-          ffprobe -version
-          ffmpeg -version
-          ffmpeg -hide_banner -encoders | grep libx264
-          ffmpeg -hide_banner -encoders | grep libx265
-          ffmpeg -hide_banner -decoders | grep hevc
+      - name: Detect and verify build-only video tools
+        run: node tools/blog/setup-video-tools.mjs
       - name: Verify sync and Markdown security
         run: npm test --prefix tools/blog
       - name: Fetch full Blog snapshot and build the complete site
