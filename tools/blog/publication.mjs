@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { copyPublicSite, writeBlog } from './lib.mjs';
@@ -25,7 +26,13 @@ export async function buildSite(root, output, prepared, config) {
   let moved = false, complete = false;
   try {
     await copyPublicSite(root, stage);
-    await writeBlog(stage, prepared, config, await fs.readFile(path.join(root, 'index.html'), 'utf8'));
+    // Bind each generated Blog page to the exact CSS/JS bytes in this artifact.
+    const assetVersions = {};
+    for (const file of ['styles.css', 'blog.css', 'i18n.js', 'blog.js', 'site.js']) {
+      try { assetVersions[file] = crypto.createHash('sha256').update(await fs.readFile(path.join(stage, file))).digest('hex').slice(0, 16); }
+      catch (error) { if (error.code !== 'ENOENT') throw error; }
+    }
+    await writeBlog(stage, prepared, { ...config, assetVersions }, await fs.readFile(path.join(root, 'index.html'), 'utf8'));
     const report = { generator: 'portfolio-discussions-blog', posts: prepared.posts.length, images: prepared.assets.size, syncedAt: new Date().toISOString() };
     await fs.writeFile(path.join(stage, '.portfolio-blog-build.json'), JSON.stringify(report, null, 2));
     if (existing) { await fs.rename(output, previous); moved = true; }

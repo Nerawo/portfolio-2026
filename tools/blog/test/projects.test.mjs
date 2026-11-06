@@ -16,7 +16,7 @@ test('opening Project line is removed; whitespace, Unicode and case keys normali
  assert.equal(result.project,'Tear Gas');assert.equal(result.summary,'Kept summary');assert.equal(result.markdown,'Body.');
 });
 test('absent fields, code, quoted/list content, later paragraphs and multiline prose are not metadata',()=>{
- for(const body of ['Ordinary prose.','Intro\n\nProject: Mentioned later','```text\nProject: In code\n```','> Project: Quoted','- Project: Listed','    Project: Indented code','Project: A paragraph begins\nthen continues here.']){
+ for(const body of ['Ordinary prose.','Intro\n\nProject: Mentioned later','```text\nProject: In code\n```','> Project: Quoted','- Project: Listed','    Project: Indented code','This paragraph mentions Project: a study\nand continues here.']){
   const parsed=parseProject(body);assert.equal(parsed.project,'Uncategorized');assert.equal(parsed.markdown,body);
  }
 });

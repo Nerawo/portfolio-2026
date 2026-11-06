@@ -6,15 +6,13 @@ export function parseProject(markdown, { warn = console.warn } = {}) {
   const lines = markdown.split(/\r?\n/), removed = new Set();
   let project = '', fields = 0;
   // Only the opening metadata block (optionally after a Markdown heading).
-  // A blank line must separate metadata from prose. Code, quotes, lists and
+  // An opening standalone Project line is reserved even with a single newline. Code, quotes, lists and
   // later paragraphs are never scanned for fields.
   for (let index = 0; index < Math.min(lines.length, 20); index++) {
     const line = lines[index];
     if (!line.trim() || /^ {0,3}#{1,6}\s+/.test(line)) continue;
     const field = line.match(/^[ \t]{0,3}Project[ \t]*:[ \t]*(.*?)[ \t]*$/i);
     if (!field) break;
-    const following = lines[index + 1];
-    if (following?.trim() && !/^[ \t]{0,3}Project[ \t]*:/i.test(following)) break;
     fields++;
     const name = normalizeProject(field[1]);
     if (!name || [...name].length > 80 || /[<>\u0000-\u001f\u007f]/.test(name)) {
