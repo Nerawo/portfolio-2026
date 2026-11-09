@@ -7,6 +7,101 @@
     node.textContent = zh ? name ? '来源：' + name + ' ↗' : '查看来源 ↗' : name ? 'Source: ' + name + ' ↗' : 'View source ↗';
   });
   document.querySelector('.blog-article-navigation')?.setAttribute('aria-label', zh ? '文章导航' : 'Article navigation');
+  const timeline = document.querySelector('.blog-project-timeline');
+  if (timeline) {
+    const track = timeline.querySelector('.blog-timeline-track');
+    const links = [...track.querySelectorAll('.blog-timeline-dot')];
+    const current = Math.max(0, links.findIndex(link => link.hasAttribute('aria-current')));
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const desktop = matchMedia('(min-width: 1360px)');
+    let pointer = null, keyboard = null, active = null, frame = 0, previousTime = 0;
+    let bases = [], offsets = links.map(() => 0), velocities = links.map(() => 0), targets = [], readyAt = [];
+    let trackTop = 0, scrollTop = 0, cell = 32;
+    const focusIndex = () => pointer ?? keyboard ?? current;
+    function placeTooltip() {
+      if (active === null || !bases.length) return;
+      const tip = links[active].querySelector('.blog-timeline-tooltip');
+      const left = timeline.getBoundingClientRect().right + 8;
+      tip.style.left = left + 'px';
+      tip.style.setProperty('--timeline-tip-width', Math.min(580, innerWidth - left - 20) + 'px');
+      const y = trackTop + bases[active] + offsets[active] - scrollTop;
+      tip.style.top = Math.max(20, Math.min(innerHeight - tip.offsetHeight - 20, y - tip.offsetHeight / 2)) + 'px';
+    }
+    function draw() {
+      links.forEach((link, i) => link.querySelector('.blog-timeline-node').style.setProperty('--timeline-offset', offsets[i] + 'px'));
+      track.style.setProperty('--timeline-first', bases[0] + offsets[0] + 'px');
+      track.style.setProperty('--timeline-length', bases.at(-1) + offsets.at(-1) - bases[0] - offsets[0] + 'px');
+      placeTooltip();
+    }
+    function tick(now) {
+      frame = 0;
+      const dt = Math.min(.024, Math.max(.001, (now - previousTime) / 1000));
+      previousTime = now;
+      let moving = false;
+      offsets.forEach((value, i) => {
+        if (now < readyAt[i]) { moving = true; return; }
+        // Damped spring redirects from the current position and velocity on interruption.
+        velocities[i] += ((targets[i] - value) * 260 - velocities[i] * 31) * dt;
+        offsets[i] += velocities[i] * dt;
+        const limit = cell / 2 - 7;
+        offsets[i] = Math.max(-limit, Math.min(limit, offsets[i]));
+        if (Math.abs(targets[i] - offsets[i]) < .025 && Math.abs(velocities[i]) < .1) { offsets[i] = targets[i]; velocities[i] = 0; }
+        else moving = true;
+      });
+      draw();
+      if (moving && desktop.matches && !document.hidden) frame = requestAnimationFrame(tick);
+      timeline.toggleAttribute('data-animating', !!frame);
+    }
+    function distribute(immediate = false) {
+      if (!desktop.matches || !bases.length) return;
+      const focus = focusIndex(), n = links.length;
+      // Integrate increasing gaps, then normalize to the original total height.
+      const weights = Array.from({length:n - 1}, (_, i) => .66 + .68 * Math.abs(i + .5 - focus) / Math.max(1, n - 1));
+      const total = weights.reduce((a,b) => a + b, 0);
+      let sum = 0;
+      targets = links.map((_, i) => {
+        if (i) sum += weights[i - 1];
+        const desired = bases[0] + sum / total * (bases.at(-1) - bases[0]);
+        // Visuals stay inside their fixed hit cells, so moving dots never change link identity.
+        return Math.max(-cell / 2 + 7, Math.min(cell / 2 - 7, desired - bases[i]));
+      });
+      const now = performance.now();
+      readyAt = links.map((_,i) => now + Math.min(70, Math.abs(i - focus) * 9));
+      if (immediate || reduced.matches) { cancelAnimationFrame(frame); frame = 0; offsets = [...targets]; velocities.fill(0); timeline.removeAttribute('data-animating'); draw(); }
+      else if (!frame) { previousTime = now; frame = requestAnimationFrame(tick); }
+    }
+    function activate() {
+      active = pointer ?? keyboard;
+      links.forEach((link,i) => link.toggleAttribute('data-timeline-active', i === active));
+      placeTooltip();
+      distribute();
+    }
+    links.forEach((link,i) => {
+      link.addEventListener('pointerenter', () => { pointer = i; activate(); });
+      link.addEventListener('focus', () => { pointer = null; keyboard = i; activate(); });
+      link.addEventListener('blur', () => { keyboard = null; activate(); });
+    });
+    track.addEventListener('pointerleave', () => { pointer = null; activate(); });
+    track.addEventListener('scroll', () => { scrollTop = track.scrollTop; placeTooltip(); }, {passive:true});
+    function position() {
+      const footer = document.querySelector('.contact-footer');
+      timeline.toggleAttribute('data-footer-overlap', !!footer && footer.getBoundingClientRect().top < timeline.getBoundingClientRect().bottom + 16);
+      placeTooltip();
+    }
+    function measure() {
+      if (!desktop.matches) { cancelAnimationFrame(frame); frame = 0; timeline.removeAttribute('data-animating'); return; }
+      cell = links[0].offsetHeight;
+      bases = links.map(link => link.offsetTop + cell / 2);
+      track.scrollTop = Math.max(0, bases[current] - track.clientHeight / 2);
+      trackTop = track.getBoundingClientRect().top; scrollTop = track.scrollTop;
+      distribute(true); position();
+    }
+    addEventListener('resize', measure);
+    addEventListener('scroll', position, {passive:true});
+    reduced.addEventListener('change', () => distribute(true));
+    document.addEventListener('visibilitychange', () => { if (document.hidden) { cancelAnimationFrame(frame); frame = 0; } else measure(); });
+    measure();
+  }
   // Progressive enhancement: the complete chronological list remains in HTML.
   const projectList = document.querySelector('[data-blog-project-list]');
   if (projectList) {
