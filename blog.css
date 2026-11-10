@@ -139,8 +139,7 @@
 .blog-project-timeline { display:none; }
 @media (min-width:1360px) {
 .blog-project-timeline { position:fixed; top:100px; bottom:100px; left:calc((100vw - 760px)/4 - 22px); width:44px; display:flex; align-items:center; z-index:10; pointer-events:none; }
-.blog-project-timeline[data-footer-overlap] { visibility:hidden; }
-.blog-timeline-track { position:relative; width:44px; max-height:100%; overflow-y:auto; overflow-x:hidden; padding-block:24px; scrollbar-width:thin; pointer-events:auto; overscroll-behavior:contain; }
+.blog-timeline-track { position:relative; top:var(--timeline-lift,0px); width:44px; max-height:var(--timeline-room,100%); overflow-y:auto; overflow-x:hidden; padding-block:24px; scrollbar-width:thin; pointer-events:auto; overscroll-behavior:contain; }
 .blog-timeline-track::before { content:''; position:absolute; top:var(--timeline-first,10px); height:var(--timeline-length,calc(100% - 20px)); left:21.5px; width:1px; background:var(--line); pointer-events:none; }
 .blog-timeline-dot { position:relative; display:block; width:44px; height:clamp(39px,4.9svh,54px); }
 .blog-timeline-node { position:absolute; left:0; top:50%; width:44px; height:0; transform:translateY(var(--timeline-offset,0px)); pointer-events:none; }

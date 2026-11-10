@@ -84,8 +84,22 @@
     track.addEventListener('pointerleave', () => { pointer = null; activate(); });
     track.addEventListener('scroll', () => { scrollTop = track.scrollTop; placeTooltip(); }, {passive:true});
     function position() {
+      if (!desktop.matches) return;
       const footer = document.querySelector('.contact-footer');
-      timeline.toggleAttribute('data-footer-overlap', !!footer && footer.getBoundingClientRect().top < timeline.getBoundingClientRect().bottom + 16);
+      const naturalHeight = Math.min(track.scrollHeight, innerHeight - 200);
+      const naturalTop = (innerHeight - naturalHeight) / 2;
+      // Keep the actual track visible above the footer instead of hiding its much taller container.
+      const bottom = Math.max(144, Math.min(innerHeight - 100, footer ? footer.getBoundingClientRect().top - 16 : innerHeight));
+      const room = Math.max(44, Math.min(naturalHeight, bottom - 100));
+      const top = Math.max(100, Math.min(naturalTop, bottom - room));
+      const oldHeight = track.clientHeight;
+      track.style.setProperty('--timeline-room', room + 'px');
+      track.style.setProperty('--timeline-lift', top - (innerHeight - room) / 2 + 'px');
+      if (track.clientHeight !== oldHeight) {
+        const selected = links[keyboard ?? current];
+        if (selected.offsetTop < track.scrollTop || selected.offsetTop + cell > track.scrollTop + track.clientHeight) track.scrollTop = Math.max(0, selected.offsetTop - (track.clientHeight - cell) / 2);
+      }
+      trackTop = track.getBoundingClientRect().top; scrollTop = track.scrollTop;
       placeTooltip();
     }
     function measure() {
