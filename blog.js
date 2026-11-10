@@ -29,8 +29,8 @@
     }
     function draw() {
       links.forEach((link, i) => link.querySelector('.blog-timeline-node').style.setProperty('--timeline-offset', offsets[i] + 'px'));
-      track.style.setProperty('--timeline-first', bases[0] + offsets[0] + 'px');
-      track.style.setProperty('--timeline-length', bases.at(-1) + offsets.at(-1) - bases[0] - offsets[0] + 'px');
+      track.style.setProperty('--timeline-first', bases[0] + offsets[0] - 24 + 'px');
+      track.style.setProperty('--timeline-length', bases.at(-1) + offsets.at(-1) - bases[0] - offsets[0] + 48 + 'px');
       placeTooltip();
     }
     function tick(now) {
