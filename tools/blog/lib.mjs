@@ -1,3 +1,4 @@
+import { renderMediaGrids, mediaGridProse } from './media-grids.mjs';
 import fs from 'node:fs/promises';
 import { parseProject, normalizeProject, projectKey, groupProjects } from './projects.mjs';
 import path from 'node:path';
@@ -177,24 +178,29 @@ export async function preparePosts(snapshot, config, { fetcher = fetch } = {}) {
   const posts = [];
   for (const post of selected) {
     const editorial = parseEditorial(post.body, { warn: message => console.warn(`Discussion #${post.number}: ${message}`) });
-    let html = cleanMarkdown(editorial.markdown, post.url);
-    const imageTags = [...html.matchAll(/<img\b[^>]*>/g)];
-    for (const [tag] of imageTags) {
-      let attrs;
-      sanitize(tag, { allowedTags: ['img'], allowedAttributes: { img: ['src', 'alt'] }, transformTags: { img: (tagName, attribs) => { attrs = attribs; return { tagName, attribs }; } } });
-      if (!attrs?.src) { html = html.replace(tag, ''); continue; }
-      const saved = await image(attrs.src);
-      const caption = imageCaption(attrs.alt);
-      html = html.replace(tag, `<figure class="blog-figure"><div class="case-inline-media"><img src="media/${saved.filename}" alt="${escape(attrs.alt || '')}" width="${saved.width}" height="${saved.height}" loading="lazy" decoding="async"></div>${caption ? `<figcaption>${escape(caption)}</figcaption>` : ''}</figure>`);
+    const articleParser = markdownParser();
+    async function renderStandalone(markdown) {
+      let html = cleanArticleHtml(articleParser.parse(markdown), post.url);
+      const imageTags = [...html.matchAll(/<img\b[^>]*>/g)];
+      for (const [tag] of imageTags) {
+        let attrs;
+        sanitize(tag, { allowedTags: ['img'], allowedAttributes: { img: ['src', 'alt'] }, transformTags: { img: (tagName, attribs) => { attrs = attribs; return { tagName, attribs }; } } });
+        if (!attrs?.src) { html = html.replace(tag, ''); continue; }
+        const saved = await image(attrs.src);
+        const caption = imageCaption(attrs.alt);
+        html = html.replace(tag, `<figure class="blog-figure"><div class="case-inline-media"><img src="media/${saved.filename}" alt="${escape(attrs.alt || '')}" width="${saved.width}" height="${saved.height}" loading="lazy" decoding="async"></div>${caption ? `<figcaption>${escape(caption)}</figcaption>` : ''}</figure>`);
+      }
+      // Block figures must not live inside a Markdown paragraph; split mixed text/image paragraphs safely.
+      html = html.replace(/<p>([\s\S]*?)<\/p>/g, (whole, inside) => inside.includes('<figure') ? inside.split(/(<figure[\s\S]*?<\/figure>)/g).map(part => {
+        if (part.startsWith('<figure')) return part;
+        const text = part.replace(/^(?:\s*<br\s*\/?>)+|(?:<br\s*\/?>\s*)+$/g, '').trim();
+        return text ? `<p>${text}</p>` : '';
+      }).join('') : whole);
+      html = await renderMediaLinks(html, { fetcher, permittedUrl: permittedImage, assets, cache: videoCache });
+      return html;
     }
-    // Block figures must not live inside a Markdown paragraph; split mixed text/image paragraphs safely.
-    html = html.replace(/<p>([\s\S]*?)<\/p>/g, (whole, inside) => inside.includes('<figure') ? inside.split(/(<figure[\s\S]*?<\/figure>)/g).map(part => {
-      if (part.startsWith('<figure')) return part;
-      const text = part.replace(/^(?:\s*<br\s*\/?>)+|(?:<br\s*\/?>\s*)+$/g, '').trim();
-      return text ? `<p>${text}</p>` : '';
-    }).join('') : whole);
-    html = await renderMediaLinks(html, { fetcher, permittedUrl: permittedImage, assets, cache: videoCache });
-    const summary = editorial.summary || plain(cleanMarkdown(editorial.markdown, post.url).replace(/<pre>[\s\S]*?<\/pre>/g, '')).slice(0, 180);
+    const html = await renderMediaGrids(editorial.markdown, {render:renderStandalone, escape, warn:message=>console.warn(`Discussion #${post.number}: ${message}`)});
+    const summary = editorial.summary || plain(cleanMarkdown(mediaGridProse(editorial.markdown), post.url).replace(/<pre>[\s\S]*?<\/pre>/g, '')).slice(0, 180);
     const cover = editorial.cover ? await image(editorial.cover) : null;
     posts.push({ ...post, html, summary, cover, project: editorial.project });
   }
@@ -252,7 +258,7 @@ function listingExcerpt(post) {
     if (token.type === 'blockquote') return blocks(token.tokens);
     return '';
   }).join(' ');
-  return blocks(new Marked({ gfm: true }).lexer(source))
+  return blocks(new Marked({ gfm: true }).lexer(mediaGridProse(source)))
     .replace(/(?:https?:\/\/|www\.)[^\s<>]+/gi, ' ')
     .replace(/\s+([,.;:!?，。；：！？])/g, '$1')
     .replace(/\s+/g, ' ').trim().slice(0, 240);

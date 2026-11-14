@@ -1,6 +1,6 @@
 (() => {
   const zh = document.documentElement.dataset.lang === 'zh';
-  const labels = { projects: '项目归档', recent: '最近文章', allArticles: '← 全部文章', uncategorized: '未分类', emptyProjects: '发布文章后会自动生成项目文件夹。', noProjectArticles: '该项目下暂无文章。', notes: '笔记与实验', title: '博客。', emptyTitle: '暂时还没有文章。', emptyText: '文章发布后会显示在这里。你也可以先浏览我的作品。', explore: '查看作品 ↗', read: '阅读全文 ↗', back: '← 返回博客列表', published: '发布于', updated: '更新于', previous: '← 上一篇文章', next: '下一篇文章 →', videoSource: '打开视频原链接 ↗', gettyView: '前往 Getty Images 查看 ↗' };
+  const labels = { projects: '项目归档', recent: '最近文章', allArticles: '← 全部文章', uncategorized: '未分类', emptyProjects: '发布文章后会自动生成项目文件夹。', noProjectArticles: '该项目下暂无文章。', notes: '笔记与实验', title: '博客。', emptyTitle: '暂时还没有文章。', emptyText: '文章发布后会显示在这里。你也可以先浏览我的作品。', explore: '查看作品 ↗', read: '阅读全文 ↗', back: '← 返回博客列表', published: '发布于', updated: '更新于', previous: '← 上一篇文章', next: '下一篇文章 →', videoSource: '打开视频原链接 ↗', gettyView: '前往 Getty Images 查看 ↗', gridVideoUnavailable: '视频无法播放，打开原视频 ↗' };
   if (zh) document.querySelectorAll('[data-blog-ui]').forEach(node => { node.textContent = labels[node.dataset.blogUi] || node.textContent; });
   document.querySelectorAll('.blog-prose [data-blog-source]').forEach(node => {
     const name = node.dataset.blogSource;
@@ -167,6 +167,17 @@
     update();
   }
 
+  // Grid fallback stays inside the media, never below every player.
+  document.querySelectorAll('.blog-grid-player').forEach(container => {
+    const video = container.querySelector('video'), fallback = container.querySelector('.blog-grid-playback-fallback');
+    video.addEventListener('error', () => { fallback.hidden = false; });
+    video.addEventListener('canplay', () => { fallback.hidden = true; });
+    if (video.error) fallback.hidden = false;
+  });
+  document.querySelectorAll('.blog-grid-video-help summary').forEach(node => {
+    const label = zh ? '视频播放选项' : 'Video playback options';
+    node.setAttribute('aria-label', label); node.title = label;
+  });
   // Align the fallback with the rendered player, including narrower portrait media.
   document.querySelectorAll('.blog-video > video').forEach(video => {
     const caption = video.parentElement.querySelector('figcaption');

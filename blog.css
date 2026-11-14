@@ -155,3 +155,28 @@
 .blog-timeline-dot[data-timeline-active] .blog-timeline-tooltip { visibility:visible; opacity:1; }
 }
 @media (prefers-reduced-motion:reduce) { .blog-timeline-node::before, .blog-timeline-node::after, .blog-timeline-tooltip { transition:none; } }
+
+/* Author-directed media units; standalone media retain their existing rules. */
+.blog-prose > .blog-media-grid { width:calc(100% - var(--blog-media-inset)); max-width:1000px; margin:28px 0 28px var(--blog-media-inset); display:grid; grid-template-columns:repeat(var(--media-grid-columns),minmax(0,1fr)); gap:28px 20px; align-items:start; }
+.blog-media-grid-item { min-width:0; }
+.blog-prose .blog-media-grid-item > .blog-figure { width:100%; max-width:none; margin:0; }
+.blog-media-grid-item .blog-figure img { height:auto; object-fit:contain; }
+.blog-prose .blog-media-grid-title { margin:12px 0 0; font-size:1.05rem; line-height:1.4; font-weight:500; }
+.blog-media-grid-description { margin-top:10px; color:var(--muted); font-size:.9rem; line-height:1.65; }
+.blog-prose .blog-media-grid-description > :first-child { margin-top:0; }
+.blog-prose .blog-media-grid-description > :last-child { margin-bottom:0; }
+.blog-media-grid-item .blog-video figcaption, .blog-media-grid-item .blog-figure figcaption { font-size:.75rem; }
+@media (min-width:721px) and (max-width:1000px) { .blog-prose > .blog-media-grid:not(.blog-media-grid-fallback)[style*="--media-grid-columns:3"] { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:720px) { .blog-prose > .blog-media-grid { grid-template-columns:minmax(0,1fr); gap:24px; } }
+
+/* Grid sources are available inside the media; standalone source captions are untouched. */
+.blog-grid-video, .blog-grid-player { position:relative; }
+.blog-grid-playback-fallback { position:absolute; inset:0; display:grid; place-items:center; padding:16px; text-align:center; background:var(--media-bg); font-size:.85rem; }
+.blog-grid-playback-fallback[hidden] { display:none; }
+.blog-grid-video-help { position:absolute; top:6px; right:6px; z-index:2; font-size:.8rem; }
+.blog-grid-video-help summary { display:grid; place-items:center; width:28px; height:28px; border-radius:3px; background:var(--paper); color:var(--muted); cursor:pointer; list-style:none; }
+.blog-grid-video-help summary::-webkit-details-marker { display:none; }
+.blog-grid-video-help > div { position:absolute; right:0; top:34px; width:180px; max-width:65vw; padding:12px; background:var(--paper); border:1px solid var(--line); }
+.blog-grid-video-help summary:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+
+.blog-grid-unavailable { aspect-ratio:16/9; display:grid; place-items:center; padding:16px; background:var(--media-bg); text-align:center; font-size:.85rem; }
