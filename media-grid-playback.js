@@ -109,7 +109,13 @@ export function attachGridPlayback(grid) {
   const toolbar = document.createElement('div'); toolbar.className='blog-grid-controls';
   const button = document.createElement('button'); button.type='button';
   const status = document.createElement('span'); status.className='blog-grid-playback-status'; status.setAttribute('role','status');
-  toolbar.append(status,button); grid.before(toolbar);
+  toolbar.append(status,button);
+  const section = grid.closest('.blog-media-section');
+  if (section) {
+    let header = section.querySelector(':scope > .blog-media-grid-heading');
+    if (!header) { header = document.createElement('header'); header.className='blog-media-grid-heading'; section.prepend(header); }
+    header.append(toolbar);
+  } else grid.before(toolbar);
   const controller = new GridPlayback(videos,{onState:(state,message)=>{
     grid.toggleAttribute('data-grid-playing',state==='playing'||state==='loading');
     button.textContent = (state==='playing'?'Ⅱ ':state==='loading'?'× ':'▶ ') + labels[state==='playing'?'pause':state==='loading'?'loading':'play'];
@@ -120,7 +126,7 @@ export function attachGridPlayback(grid) {
   document.addEventListener('visibilitychange',()=>{if(document.hidden && ['playing','loading'].includes(controller.state))controller.pause('background');});
   addEventListener('pagehide',()=>controller.stop());
   const observer = new MutationObserver(()=>videos.forEach(v=>{if(!grid.contains(v))controller.remove(v);}));observer.observe(grid,{childList:true,subtree:true});
-  const visibility = new IntersectionObserver(entries=>{if(!entries[0].isIntersecting && ['playing','loading'].includes(controller.state))controller.pause('background');});visibility.observe(grid);
+  const visibility = new IntersectionObserver(entries=>{if(!entries[0].isIntersecting && ['playing','loading'].includes(controller.state))controller.pause('background');});visibility.observe(grid.closest('.blog-media-section') || grid);
   return controller;
 }
 if (typeof document !== 'undefined') document.querySelectorAll('.blog-media-grid').forEach(attachGridPlayback);

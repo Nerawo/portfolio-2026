@@ -81,8 +81,9 @@ export async function renderMediaGrids(markdown, { render, escape, warn = consol
       if (/<figure\b/.test(description)) { warn('media-grid item contains extra media in its description: preserving everything in one-column fallback.'); fallback = true; }
       cells.push('<div class="blog-media-grid-item">' + gridMediaPresentation(media,true) + (item.title ? '<h3 class="blog-media-grid-title">' + escape(item.title) + '</h3>' : '') + (description ? '<div class="blog-media-grid-description">' + gridMediaPresentation(description) + '</div>' : '') + '</div>');
     }
+    output.push('<section class="blog-media-section">');
     if (block.title || block.description) output.push('<header class="blog-media-grid-heading">' + (block.title ? '<h2>' + escape(block.title) + '</h2>' : '') + (block.description ? '<p>' + escape(block.description) + '</p>' : '') + '</header>');
-    output.push('<div class="blog-media-grid' + (fallback ? ' blog-media-grid-fallback' : '') + '" style="--media-grid-columns:' + (fallback ? 1 : block.columns) + '">' + cells.join('') + '</div>');
+    output.push('<div class="blog-media-grid' + (fallback ? ' blog-media-grid-fallback' : '') + '" style="--media-grid-columns:' + (fallback ? 1 : block.columns) + '">' + cells.join('') + '</div></section>');
   }
   return output.join('\n');
 }
