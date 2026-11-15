@@ -13,7 +13,7 @@ export function parseMediaGrids(markdown, { warn = console.warn } = {}) {
     if (fence || fenceAt(line)) { fence = advanceFence(line,fence); pending.push(line); continue; }
     if (!/^:::media-grid\b/.test(line) || (i && lines[i-1].trim())) { pending.push(line); continue; }
     const dimensions = line.match(/^:::media-grid\s+([1-3])\s*[xX]\s*([1-6])\s*$/);
-    const stack = ['grid'], raw = [line], items = []; let body = null, localFence = null, invalid = !dimensions, end = i;
+    const stack = ['grid'], raw = [line], items = [], section = {}, fields = new Set(); let body = null, localFence = null, invalid = !dimensions, end = i;
     for (let j = i + 1; j < lines.length; j++) {
       const text = lines[j]; raw.push(text); end = j;
       if (localFence || fenceAt(text)) { localFence = advanceFence(text,localFence); if (body) body.push(text); else invalid = true; continue; }
@@ -25,7 +25,16 @@ export function parseMediaGrids(markdown, { warn = console.warn } = {}) {
         if (!stack.length) break;
         continue;
       }
-      if (body) body.push(text); else if (text.trim()) invalid = true;
+      if (body) body.push(text);
+      else if (text.trim()) {
+        const field = !items.length && stack.length === 1 && text.match(/^(Title|Description)[ \t]*:[ \t]*(.*)$/i);
+        if (!field) invalid = true;
+        else {
+          const name = field[1].toLowerCase(), value = field[2].trim();
+          if (fields.has(name) || !value) { warn('Duplicate or empty media-grid section ' + name + ': showing safe original Markdown.'); invalid = true; }
+          fields.add(name); section[name] = value;
+        }
+      }
     }
     if (stack.length || !items.length) invalid = true;
     flush(); i = end;
@@ -39,7 +48,7 @@ export function parseMediaGrids(markdown, { warn = console.warn } = {}) {
       const newline = text.indexOf('\n');
       return {title,media:newline < 0 ? text : text.slice(0,newline).trim(),description:newline < 0 ? '' : text.slice(newline+1).trim()};
     });
-    chunks.push({kind:'grid',columns,rows,overflow,items:parsed});
+    chunks.push({kind:'grid',columns,rows,overflow,items:parsed,title:section.title || '',description:section.description || ''});
   }
   flush(); return chunks;
 }
@@ -72,11 +81,12 @@ export async function renderMediaGrids(markdown, { render, escape, warn = consol
       if (/<figure\b/.test(description)) { warn('media-grid item contains extra media in its description: preserving everything in one-column fallback.'); fallback = true; }
       cells.push('<div class="blog-media-grid-item">' + gridMediaPresentation(media,true) + (item.title ? '<h3 class="blog-media-grid-title">' + escape(item.title) + '</h3>' : '') + (description ? '<div class="blog-media-grid-description">' + gridMediaPresentation(description) + '</div>' : '') + '</div>');
     }
+    if (block.title || block.description) output.push('<header class="blog-media-grid-heading">' + (block.title ? '<h2>' + escape(block.title) + '</h2>' : '') + (block.description ? '<p>' + escape(block.description) + '</p>' : '') + '</header>');
     output.push('<div class="blog-media-grid' + (fallback ? ' blog-media-grid-fallback' : '') + '" style="--media-grid-columns:' + (fallback ? 1 : block.columns) + '">' + cells.join('') + '</div>');
   }
   return output.join('\n');
 }
 
 export function mediaGridProse(markdown) {
-  return parseMediaGrids(markdown,{warn:()=>{}}).map(block => block.kind === 'text' ? block.markdown : block.items.map(item => [item.title,item.description].filter(Boolean).join('\n\n')).join('\n\n')).join('\n\n');
+  return parseMediaGrids(markdown,{warn:()=>{}}).map(block => block.kind === 'text' ? block.markdown : [block.title,block.description,...block.items.map(item => [item.title,item.description].filter(Boolean).join('\n\n'))].filter(Boolean).join('\n\n')).join('\n\n');
 }
