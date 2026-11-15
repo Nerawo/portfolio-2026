@@ -225,7 +225,7 @@ function shell({ title, description, content, indexHtml, prefix, canonical, asse
 <meta property="og:title" content="${escape(title)} — Lu Zhang"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="${prefix ? 'article' : 'website'}"><link rel="canonical" href="${canonical}">
 <link rel="stylesheet" href="${prefix}${asset('styles.css')}"><link rel="stylesheet" href="${prefix}${asset('blog.css')}">
 </head><body class="blog-page">${headerFromIndex(indexHtml, prefix)}<main class="blog-main">${content}</main>${indexHtml.match(/<footer class="contact-footer"[\s\S]*?<\/footer>/)?.[0] || ""}
-<script src="${prefix}${asset('i18n.js')}"></script><script src="${prefix}${asset('blog.js')}"></script><script src="${prefix}${asset('site.js')}"></script></body></html>\n`;
+<script src="${prefix}${asset('i18n.js')}"></script><script src="${prefix}${asset('blog.js')}"></script><script src="${prefix}${asset('site.js')}"></script>${content.includes('class="blog-media-grid') ? `<script type="module" src="${prefix}${asset('media-grid-playback.js')}"></script>` : ''}</body></html>\n`;
 }
 
 const date = iso => new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(iso));

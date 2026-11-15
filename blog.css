@@ -180,3 +180,10 @@
 .blog-grid-video-help summary:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
 
 .blog-grid-unavailable { aspect-ratio:16/9; display:grid; place-items:center; padding:16px; background:var(--media-bg); text-align:center; font-size:.85rem; }
+
+/* Group control is outside grid cells, preserving all media columns and item order. */
+.blog-grid-controls { width:calc(100% - var(--blog-media-inset)); max-width:1000px; margin:24px 0 -16px var(--blog-media-inset); display:flex; justify-content:flex-end; align-items:center; gap:12px; }
+.blog-grid-controls button { flex:none; padding:8px 10px; min-height:36px; border:1px solid var(--line); border-radius:3px; background:transparent; color:var(--muted); font:inherit; font-size:.85rem; cursor:pointer; }
+.blog-grid-controls button:hover { color:var(--ink); }
+.blog-grid-controls button:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+.blog-grid-playback-status { color:var(--muted); font-size:.8rem; line-height:1.5; }

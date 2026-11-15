@@ -5,7 +5,7 @@
  const resumes={en:'file/resume/Lu_Zhang_Resume_02.pdf',zh:'file/resume/张璐_简历_02.pdf'};
  document.querySelectorAll('[data-resume]').forEach(a=>{a.href=new URL(resumes[a.dataset.resume],base).href;a.textContent=zh?(a.dataset.resume==='zh'?'中文简历':'英文简历'):(a.dataset.resume==='zh'?'中文':'English');});
  document.querySelectorAll('video').forEach(v=>{if(!v.closest('.archive-media, .blog-video'))v.preload='none';});
- const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(!e.isIntersecting)e.target.pause();}),{threshold:0});
+ const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(!e.isIntersecting && !e.target.closest('[data-grid-playing]'))e.target.pause();}),{threshold:0});
  document.querySelectorAll('video').forEach(v=>observer.observe(v));
  document.addEventListener('visibilitychange',()=>{if(document.hidden)document.querySelectorAll('video').forEach(v=>v.pause());});
  const motion=matchMedia('(prefers-reduced-motion: reduce)');

@@ -28,7 +28,7 @@ export async function buildSite(root, output, prepared, config) {
     await copyPublicSite(root, stage);
     // Bind each generated Blog page to the exact CSS/JS bytes in this artifact.
     const assetVersions = {};
-    for (const file of ['styles.css', 'blog.css', 'i18n.js', 'blog.js', 'site.js']) {
+    for (const file of ['styles.css', 'blog.css', 'i18n.js', 'blog.js', 'site.js', 'media-grid-playback.js']) {
       try { assetVersions[file] = crypto.createHash('sha256').update(await fs.readFile(path.join(stage, file))).digest('hex').slice(0, 16); }
       catch (error) { if (error.code !== 'ENOENT') throw error; }
     }
